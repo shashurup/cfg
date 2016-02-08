@@ -15,15 +15,26 @@ fi
 
 export GTK2_RC_FILES="$HOME/.gtkrc-2.0"
 
-setxkbmap -option grp:alt_shift_toggle,compose:prsc us,ru
-xmodmap -e "clear control"
-xmodmap -e "clear mod1"
-xmodmap -e "keycode 37 = Alt_L Meta_L"
-xmodmap -e "keycode 105 = Alt_R"
-xmodmap -e "keycode 64 = Control_L"
-xmodmap -e "keycode 108 = Control_R"
-xmodmap -e "add mod1 = Alt_L Meta_L Alt_R"
-xmodmap -e "add control = Control_L Control_R"
+#setxkbmap -option grp:alt_shift_toggle -option compose:prsc -layout us,ru
+# swap CTRL and ALT
+xkbcomp - $DISPLAY <<EOF
+xkb_keymap {
+	xkb_keycodes  {
+	    include "evdev+aliases(qwerty)"
+
+	    <LALT> = 37;
+	    <LCTL> = 64;
+
+	    <RCTL> = 108;
+	    <RALT> = 105;
+
+	    alias <ALGR> = <RALT>; };
+	xkb_types     { include "complete"	};
+	xkb_compat    { include "complete"	};
+	xkb_symbols   { include "pc+us+ru:2+inet(evdev)+group(alt_shift_toggle)+compose(prsc)"	};
+	xkb_geometry  { include "pc(pc105)"	};
+};
+EOF
 
 #xscreensaver -no-splash &
 #kbdd &
