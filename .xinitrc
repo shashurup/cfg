@@ -29,10 +29,10 @@ xkb_keymap {
 	    <RALT> = 105;
 
 	    alias <ALGR> = <RALT>; };
-	xkb_types     { include "complete"	};
-	xkb_compat    { include "complete"	};
-	xkb_symbols   { include "pc+us+ru:2+inet(evdev)+group(alt_shift_toggle)+compose(prsc)"	};
-	xkb_geometry  { include "pc(pc105)"	};
+	xkb_types     { include "complete" };
+	xkb_compat    { include "complete" };
+	xkb_symbols   { include "pc+us+ru:2+inet(evdev)+capslock(grouplock)+compose(prsc)" };
+	xkb_geometry  { include "pc(pc105)" };
 };
 EOF
 
