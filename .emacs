@@ -3,7 +3,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(custom-enabled-themes (quote (tango-dark)))
+ '(custom-enabled-themes (quote (wombat)))
  '(ediff-split-window-function (quote split-window-horizontally))
  '(evil-flash-delay 8)
  '(evil-symbol-word-search t)
