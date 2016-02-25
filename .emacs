@@ -17,6 +17,10 @@
  ;; If there is more than one, they won't work right.
  '(default ((t (:family "DejaVu Sans Mono" :foundry "unknown" :slant normal :weight normal :height 90 :width normal)))))
 
+(when (eq system-type 'darwin)
+  (set-frame-font "Monaco-10" nil t)
+  (setq exec-path (append exec-path '("/usr/local/bin"))))
+
 (require 'package)
 (add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
 (package-initialize)
