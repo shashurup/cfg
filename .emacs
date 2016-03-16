@@ -37,3 +37,5 @@
 (elpy-enable)
 (elpy-use-ipython)
 (evil-define-key 'normal python-mode-map (kbd "RET") 'elpy-goto-definition)
+
+(global-set-key (kbd "C-x p") 'find-file-in-project)
