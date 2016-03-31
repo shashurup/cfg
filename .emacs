@@ -40,4 +40,5 @@
 
 (global-set-key (kbd "C-x p") 'find-file-in-project)
 
-(require 'git)
+(global-set-key (kbd "C-x g") 'magit-status)
+(require 'evil-magit)
