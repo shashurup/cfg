@@ -34,6 +34,8 @@
 (define-key evil-inner-text-objects-map "w" 'evil-inner-symbol)
 (evil-define-key 'normal python-mode-map (kbd "<backspace>") 'pop-tag-mark)
 
+(setq python-check-command "flake8")
+
 (elpy-enable)
 (elpy-use-ipython)
 (evil-define-key 'normal python-mode-map (kbd "RET") 'elpy-goto-definition)
