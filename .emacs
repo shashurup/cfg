@@ -45,3 +45,5 @@
 
 (projectile-global-mode)
 (helm-projectile-on)
+
+(global-set-key (kbd "C-x b") 'helm-buffers-list)
