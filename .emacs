@@ -18,6 +18,7 @@
  )
 
 (when (eq system-type 'gnu/linux)
+  (menu-bar-mode -99)
   (set-frame-font "Monospace-9" nil t))
 
 (when (eq system-type 'darwin)
