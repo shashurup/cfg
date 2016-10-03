@@ -9,6 +9,9 @@
  '(evil-symbol-word-search t)
  '(inhibit-startup-screen t)
  '(ns-command-modifier (quote control))
+ '(package-selected-packages
+   (quote
+    (helm-projectile evil-magit elpy ac-cider)))
  '(tool-bar-mode nil))
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -53,3 +56,5 @@
 (helm-projectile-on)
 
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
+
+(require 'midnight)
