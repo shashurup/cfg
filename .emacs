@@ -58,3 +58,5 @@
 (global-set-key (kbd "C-x b") 'helm-buffers-list)
 
 (require 'midnight)
+
+(savehist-mode 1)
