@@ -39,17 +39,11 @@ values."
      yaml
      helm
      auto-completion
-     ;; better-defaults
      emacs-lisp
      git
      markdown
-     ;; org
-     ;; (shell :variables
-     ;;        shell-default-height 30
-     ;;        shell-default-position 'bottom)
      spell-checking
      syntax-checking
-     ;; version-control
      )
    ;; List of additional packages that will be installed without being
    ;; wrapped in a layer. If you need some configuration for these
@@ -301,7 +295,8 @@ layers configuration.
 This is the place where most of your configurations should be done. Unless it is
 explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
-  (setq powerline-default-separator nil))
+  (setq powerline-default-separator nil)
+  (evil-set-initial-state 'term-mode 'emacs))
 
 ;; Do not write anything past this comment. This is where Emacs will
 ;; auto-generate custom variable definitions.
@@ -319,10 +314,10 @@ you should place your code here."
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
+ '(hl-line ((t (:background "#000000" :underline nil))))
  '(term-color-blue ((t (:background "dodger blue" :foreground "dodger blue"))))
  '(term-color-cyan ((t (:background "cyan" :foreground "cyan"))))
  '(term-color-green ((t (:background "spring green" :foreground "spring green"))))
  '(term-color-magenta ((t (:background "magenta" :foreground "magenta"))))
  '(term-color-red ((t (:background "orange red" :foreground "orange red"))))
- '(term-color-yellow ((t (:background "yellow" :foreground "yellow"))))
- '(hl-line ((t (:background "#000000" :underline nil)))))
+ '(term-color-yellow ((t (:background "yellow" :foreground "yellow")))))
