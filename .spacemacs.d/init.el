@@ -28,18 +28,11 @@ You should not put any user code in there besides modifying the variable
 values."
   (setq-default
    ;; gnutls-trustfiles '("/etc/ssl/cert.pem")
-   ;; Maximum allowed time in seconds to contact an ELPA repository.
    dotspacemacs-elpa-timeout 5
-   ;; If non nil output loading progress in `*Messages*' buffer. (default nil)
    dotspacemacs-verbose-loading t
-   ;; List of themes, the first of the list is loaded when spacemacs starts.
-   ;; Press <SPC> T n to cycle to the next theme in the list (works great
-   ;; with 2 themes variants, one dark and one light)
    dotspacemacs-themes '(wombat
                          spacemacs-dark
                          spacemacs-light)
-   ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
-   ;; quickly tweak the mode-line size to make separators look not too crappy.
    dotspacemacs-default-font
     (cond ((eq system-type 'darwin)    '("Monaco"
                                          :size 10
@@ -61,7 +54,8 @@ executes.
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
   (setq ispell-dictionary "english")
-  (setq custom-file "~/.spacemacs.d/custom.el"))
+  ;; (setq custom-file "~/.spacemacs.d/custom.el")
+  )
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
@@ -72,5 +66,26 @@ explicitly specified that a variable should be set before a package is loaded,
 you should place your code here."
   (setq powerline-default-separator nil)
   (evil-set-initial-state 'term-mode 'emacs)
-  (when (file-exists-p custom-file)
-    (load-file custom-file)))
+  ;; (when (file-exists-p custom-file)
+  ;;  (load-file custom-file))
+  )
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(ns-command-modifier (quote control))
+ '(paradox-github-token t))
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(hl-line ((t (:background "#000000" :underline nil))))
+ '(term-color-blue ((t (:background "dodger blue" :foreground "dodger blue"))))
+ '(term-color-cyan ((t (:background "cyan" :foreground "cyan"))))
+ '(term-color-green ((t (:background "spring green" :foreground "spring green"))))
+ '(term-color-magenta ((t (:background "magenta" :foreground "magenta"))))
+ '(term-color-red ((t (:background "orange red" :foreground "orange red"))))
+ '(term-color-yellow ((t (:background "yellow" :foreground "yellow")))))
