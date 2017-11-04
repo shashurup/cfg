@@ -31,17 +31,16 @@ values."
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
    '(
-     ruby
      python
      clojure
-     shell
-     (shell :variables shell-default-term-shell "/bin/fish")
+     (shell :variables shell-default-term-shell "fish")
      yaml
      helm
      auto-completion
      emacs-lisp
      git
      markdown
+     org
      spell-checking
      syntax-checking
      )
@@ -128,11 +127,17 @@ values."
    dotspacemacs-colorize-cursor-according-to-state t
    ;; Default font, or prioritized list of fonts. `powerline-scale' allows to
    ;; quickly tweak the mode-line size to make separators look not too crappy.
-   dotspacemacs-default-font '("Monaco"
-                               :size 10
-                               :weight normal
-                               :width normal
-                               :powerline-scale 1.1)
+   dotspacemacs-default-font
+    (cond ((eq system-type 'darwin)    '("Monaco"
+                                         :size 10
+                                         :weight normal
+                                         :width normal
+                                         :powerline-scale 1.1))
+          ((eq system-type 'gnu/linux) '("Monospace"
+                                         :size 12
+                                         :weight normal
+                                         :width normal
+                                         :powerline-scale 1.1)))
    ;; The leader key
    dotspacemacs-leader-key "SPC"
    ;; The key used for Emacs commands (M-x) (after pressing on the leader key).
@@ -286,7 +291,7 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
-  (setq ispell-dictionary "en"))
+  (setq ispell-dictionary "english"))
 
 (defun dotspacemacs/user-config ()
   "Configuration function for user code.
