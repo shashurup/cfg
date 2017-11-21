@@ -18,6 +18,8 @@ values."
      org
      spell-checking
      syntax-checking
+     shell-scripts
+     javascript
      )))
 
 (defun dotspacemacs/init ()
