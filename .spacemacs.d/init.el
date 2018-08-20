@@ -58,7 +58,12 @@ executes.
  This function is mostly useful for variables that need to be set
 before packages are loaded. If you are unsure, you should try in setting them in
 `dotspacemacs/user-config' first."
-  (setq ispell-dictionary "english")
+  (setq ispell-dictionary "english"
+        calendar-week-start-day 1
+        calendar-day-name-array ["Вс" "Пн" "Вт" "Ср" "Чт" "Пт" "Сб"]
+        calendar-month-name-array ["Январь" "Февраль" "Март" "Апрель" "Май"
+                                   "Июнь" "Июль" "Август" "Сентябрь"
+                                   "Октябрь" "Ноябрь" "Декабрь"])
   ;; (setq custom-file "~/.spacemacs.d/custom.el")
   )
 
