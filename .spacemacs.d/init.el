@@ -8,8 +8,9 @@ values."
    '(
       python
       clojure
-      (shell :variables shell-default-term-shell "fish")
+      (shell :variables shell-default-shell 'eshell)
       yaml
+      html
       helm
       auto-completion
       emacs-lisp
@@ -22,6 +23,7 @@ values."
       javascript
       sql
       restclient
+      mu4e
      )
    dotspacemacs-additional-packages '(org-jira)))
 
@@ -32,8 +34,6 @@ before layers configuration.
 You should not put any user code in there besides modifying the variable
 values."
   (setq-default
-   gnutls-trustfiles '("/etc/ssl/cert.pem")
-   dotspacemacs-elpa-timeout 5
    dotspacemacs-verbose-loading t
    dotspacemacs-themes '(spacemacs-light
                          spacemacs-dark
@@ -77,7 +77,9 @@ you should place your code here."
   (setq powerline-default-separator nil)
   (setq jiralib-url "https://jira.lpr.jet.msk.su")
   (setq org-jira-working-dir "~/jet/org")
-  (evil-set-initial-state 'term-mode 'emacs)
+  (setq auth-sources '(default))
+  (setq user-full-name "Георгий Кибардин")
+  (load-file "~/.spacemacs.d/mu4e.el")
   ;; (when (file-exists-p custom-file)
   ;;  (load-file custom-file))
   )
