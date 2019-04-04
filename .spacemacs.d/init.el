@@ -4,11 +4,12 @@
 You should not put any user code in this function besides modifying the variable
 values."
   (setq-default
+   dotspacemacs-enable-lazy-installation nil
    dotspacemacs-configuration-layers
    '(
       python
       clojure
-      (shell :variables shell-default-shell 'eshell)
+      (shell :variables shell-default-shell 'shell)
       yaml
       html
       helm
@@ -23,7 +24,10 @@ values."
       javascript
       sql
       restclient
-      mu4e
+      (mu4e :variables mu4e-enable-mode-line t)
+      rust
+      pdf-tools
+      csharp
      )
    dotspacemacs-additional-packages '(org-jira)))
 
@@ -79,6 +83,13 @@ you should place your code here."
   (setq org-jira-working-dir "~/jet/org")
   (setq auth-sources '(default))
   (setq user-full-name "Георгий Кибардин")
+  (evil-define-key 'normal cider-repl-mode-map
+    (kbd "C-j") 'cider-repl-next-input
+    (kbd "C-k") 'cider-repl-previous-input
+    (kbd "RET") 'cider-repl-return)
+  (evil-define-key 'insert cider-repl-mode-map
+    (kbd "C-j") 'cider-repl-next-input
+    (kbd "C-k") 'cider-repl-previous-input)
   (load-file "~/.spacemacs.d/mu4e.el")
   ;; (when (file-exists-p custom-file)
   ;;  (load-file custom-file))
