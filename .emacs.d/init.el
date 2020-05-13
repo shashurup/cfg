@@ -10,7 +10,7 @@
  '(ns-command-modifier (quote control))
  '(package-selected-packages
    (quote
-    (doom-themes dakrone-theme humanoid-themes kaolin-themes oceanic-theme zeno-theme pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
+    (doom-themes dakrone-theme humanoid-themes kaolin-themes oceanic-theme zeno-theme company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
  '(tool-bar-mode nil))
 
 (custom-set-faces
@@ -21,7 +21,8 @@
  )
 
 ;; Common vars
-(setq ispell-dictionary "english"
+(setq user-full-name "First Last"
+      ispell-dictionary "english"
       calendar-week-start-day 1
       calendar-date-style "european"
       calendar-day-name-array ["Вс" "Пн" "Вт" "Ср" "Чт" "Пт" "Сб"]
@@ -71,9 +72,11 @@
 
 ; Basic keybinding are inspired by spacemacs
 (define-key my-root-map " " 'execute-extended-command)
+(define-key my-root-map ":" 'eval-expression)
 (define-key my-root-map "'" 'eshell)
 (define-key my-root-map "!" 'shell-command)
-(define-key my-root-map "?" 'describe-bindings)
+(define-key my-root-map "u" 'universal-argument)
+
 
 (define-key my-root-map "bb" 'switch-to-buffer)
 (define-key my-root-map "bd" 'kill-current-buffer)
@@ -90,6 +93,7 @@
 (define-key my-root-map "hdk" 'describe-key)
 (define-key my-root-map "hdm" 'describe-mode)
 (define-key my-root-map "hdv" 'describe-variable)
+(define-key my-root-map "hdp" 'describe-package)
 (define-key my-root-map "hi" 'info)
 (define-key my-root-map "hm" 'man)
 (define-key my-root-map "hr" 'info-emacs-manual)
@@ -143,31 +147,42 @@
 (define-key org-mode-map (kbd "<localleader> ,") 'org-ctrl-c-ctrl-c)
 (define-key org-mode-map (kbd "<localleader> /") 'org-sparse-tree)
 
+(defun my-bind-basic-motion (map)
+  (define-key map "j" 'next-line)
+  (define-key map "k" 'previous-line)
+  (define-key map "/" 'evil-search-forward)
+  (define-key map "?" 'evil-search-backward)
+  (define-key map "n" 'evil-search-next)
+  (define-key map "N" 'evil-search-previous)
+  (define-key map (kbd "C-f") 'evil-scroll-page-down)
+  (define-key map (kbd "C-b") 'evil-scroll-page-up)
+  (if (not (keymapp (lookup-key map "g")))
+      (define-key map "g" nil))
+  (define-key map "gg" 'beginning-of-buffer)
+  (define-key map "G" 'end-of-buffer))
+
+;; Proced
+(define-key my-root-map "ap" 'proced)
+(with-eval-after-load 'proced
+  (define-key proced-mode-map " " my-root-map)
+  (my-bind-basic-motion proced-mode-map)
+  (define-key proced-mode-map "gr" 'revert-buffer))
+
 ;; Package list
 (define-key package-menu-mode-map " " my-root-map)
-(define-key package-menu-mode-map "j" 'next-line)
-(define-key package-menu-mode-map "k" 'previous-line)
-(define-key package-menu-mode-map "/" 'evil-search-forward)
-(define-key package-menu-mode-map "?" 'evil-search-backward)
-(define-key package-menu-mode-map "n" 'evil-search-next)
-(define-key package-menu-mode-map "N" 'evil-search-previous)
-(define-key package-menu-mode-map (kbd "C-f") 'evil-scroll-page-down)
-(define-key package-menu-mode-map (kbd "C-b") 'evil-scroll-page-up)
+(my-bind-basic-motion package-menu-mode-map)
+(define-key package-menu-mode-map "gr" 'revert-buffer)
 
 ;; Dired
 (evil-set-initial-state 'dired-mode 'emacs)
 (with-eval-after-load 'dired
   (define-key dired-mode-map " " my-root-map)
-  (define-key dired-mode-map "j" 'next-line)
-  (define-key dired-mode-map "k" 'previous-line)
+  (my-bind-basic-motion dired-mode-map)
   (define-key dired-mode-map "J" 'dired-goto-file)
   (define-key dired-mode-map "K" 'dired-do-kill-lines)
-  (define-key dired-mode-map "/" 'evil-search-forward)
-  (define-key dired-mode-map "?" 'evil-search-backward)
-  (define-key dired-mode-map "n" 'evil-search-next)
-  (define-key dired-mode-map "N" 'evil-search-previous)
-  (define-key dired-mode-map (kbd "C-f") 'evil-scroll-page-down)
-  (define-key dired-mode-map (kbd "C-b") 'evil-scroll-page-up))
+  (define-key dired-mode-map "gr" 'revert-buffer)
+  (define-key dired-mode-map "gf" 'dired-goto-file)
+  (define-key dired-mode-map "gG" 'dired-do-chgrp))
 
 ;; Custom
 (with-eval-after-load 'cus-edit
@@ -208,12 +223,12 @@
 ;  (counsel-ag (ivy-thing-at-point) dir))
 
 (define-key my-root-map " " 'counsel-M-x)
-(define-key my-root-map "?" 'counsel-descbinds)
 (define-key my-root-map "bb" 'ivy-switch-buffer)
 (define-key my-root-map "ff" 'counsel-find-file)
 (define-key my-root-map "fr" 'counsel-recentf)
 (define-key my-root-map "hdf" 'counsel-describe-function)
 (define-key my-root-map "hdv" 'counsel-describe-variable)
+(define-key my-root-map "hdk" 'counsel-descbinds)
 (define-key my-root-map "sb" 'swiper-thing-at-point)
 (define-key my-root-map "sd" 'counsel-ag-with-thing-at-point)
 
@@ -250,7 +265,7 @@
 
 
 ;; which key
-(define-key my-root-map "hk" 'which-key-show-top-level)
+(define-key my-root-map (kbd "h SPC") 'which-key-show-top-level)
 (which-key-mode)
 
 
@@ -262,6 +277,9 @@
 (with-eval-after-load 'magit
   (require 'evil-magit))
 
+
+;; company
+(global-company-mode)
 
 ;; python
 ;; TODO pyenv shim path for child processes
@@ -285,13 +303,16 @@
   (define-key elpy-mode-map (kbd "<localleader> S n") 'elpy-flymake-next-error)
   (define-key elpy-mode-map (kbd "<localleader> S p") 'elpy-flymake-previous-error)
   (elpy-enable))
+(with-eval-after-load 'python
+  (add-hook 'python-mode-hook 'elpy-enable))
 
 ;; mu4e
 (load "~/.emacs.d/mu4e.el")
 
+;; TODO factor out basic motion
 ;; TODO layouts (persp mode)
 ;; TODO org mode keybindings
-;; TODO clojure mode
+;; TODO clojure mode (smartparens?)
 ;; TODO image mode
 ;; TODO pdf mode
 ;; TODO docview mode
@@ -300,3 +321,6 @@
 ;; TODO check out hydra (ivy-hydra)
 ;; TODO refine man keys
 ;; TODO folding
+;; TODO toggles
+;; TODO keybindings in magit commit buffer
+;; TODO personal data, mail accounts etc. in separate file
