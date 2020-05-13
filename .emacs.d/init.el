@@ -10,7 +10,7 @@
  '(ns-command-modifier (quote control))
  '(package-selected-packages
    (quote
-    (doom-themes dakrone-theme humanoid-themes kaolin-themes oceanic-theme zeno-theme company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
+    (smooth-scrolling doom-themes humanoid-themes kaolin-themes company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
  '(tool-bar-mode nil))
 
 (custom-set-faces
@@ -49,7 +49,7 @@
 (setq package-enable-at-startup nil)
 
 ;; theme
-(load-theme 'dakrone t)
+(load-theme 'doom-henna t)
 
 
 ;; core
@@ -195,7 +195,15 @@
 (define-key emacs-lisp-mode-map (kbd "<localleader> r") 'eval-region)
 (define-key emacs-lisp-mode-map (kbd "<localleader> b") 'eval-buffer)
 
+;; man
+(evil-define-key 'motion Man-mode-map (kbd "TAB") 'forward-button)
+(evil-define-key 'motion Man-mode-map "gs" 'Man-goto-section)
+(evil-define-key 'motion Man-mode-map "]]" 'Man-next-section)
+(evil-define-key 'motion Man-mode-map "][" 'Man-next-section)
+(evil-define-key 'motion Man-mode-map "[[" 'Man-previous-section)
+(evil-define-key 'motion Man-mode-map "[]" 'Man-previous-section)
 
+ 
 ;; ag
 (define-key my-root-map "sf" 'ag-dired)
 (define-key my-root-map "sg" 'ag)
@@ -281,6 +289,11 @@
 ;; company
 (global-company-mode)
 
+;; smooth scrolling
+(smooth-scrolling-mode 1)
+
+
+
 ;; python
 ;; TODO pyenv shim path for child processes
 ;; TODO autoload on visiting python files
@@ -309,7 +322,7 @@
 ;; mu4e
 (load "~/.emacs.d/mu4e.el")
 
-;; TODO factor out basic motion
+;; TODO second "SPC w m" must restore the layout
 ;; TODO layouts (persp mode)
 ;; TODO org mode keybindings
 ;; TODO clojure mode (smartparens?)
@@ -319,7 +332,6 @@
 ;; TODO sql repl
 ;; TODO setup eshell
 ;; TODO check out hydra (ivy-hydra)
-;; TODO refine man keys
 ;; TODO folding
 ;; TODO toggles
 ;; TODO keybindings in magit commit buffer
