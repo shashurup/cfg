@@ -337,6 +337,10 @@
 (define-key my-root-map "gb" 'magit-blame-addition)
 (define-key my-root-map "gm" 'magit-dispatch)
 (define-key my-root-map "gl" 'magit-log-buffer-file)
+(evil-define-key 'normal 'with-editor-mode-map (kbd "<localleader> ,") 'with-editor-finish)
+(evil-define-key 'normal 'with-editor-mode-map (kbd "<localleader> k") 'with-editor-cancel)
+(evil-define-key 'normal 'magit-diff-mode-map " " my-root-map)
+(evil-initial-state 'magit-diff-mode 'motion)
 (with-eval-after-load 'magit
   (require 'evil-magit))
 
@@ -422,7 +426,6 @@
 ;; TODO setup eshell
 ;; TODO check out hydra (ivy-hydra)
 ;; TODO folding
-;; TODO keybindings in magit commit buffer
 ;; TODO pdf mode (check out pdf tools)
 ;; TODO ediff keybindings and floating window
 ;; Themes to consider:
