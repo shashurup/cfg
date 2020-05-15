@@ -37,6 +37,7 @@
 (setq send-mail-function 'smtpmail-send-it
       auth-sources '(default)
       ; mu4e-view-use-gnus t
+      mu4e-confirm-quit nil
       mu4e-view-show-images t
       mu4e-view-show-addresses t
       mu4e-context-policy 'ask-if-none
@@ -51,15 +52,23 @@
 			    (:from-or-to . 24)
 			    (:subject)))
 
+(define-key my-root-map "amm" 'mu4e)
+
 (with-eval-after-load 'mu4e
 
   (require 'evil)
   (require 'ivy)
 
   (setq mu4e-completing-read-function 'ivy-read)
-  
+  (mu4e-alert-enable-mode-line-display)
+
   ;; Binding fixed
-  (define-key my-root-map "aM" 'mu4e)
+  (define-key my-root-map "amu" (lambda ()
+				  (interactive)
+				  (mu4e-headers-search-bookmark "flag:unread AND NOT flag:trashed")))
+  (define-key my-root-map "ams" 'mu4e-headers-search)
+  (define-key my-root-map "amj" 'mu4e~headers-jump-to-maildir)
+  (define-key my-root-map "amc" 'mu4e-compose-new)
   (define-key mu4e-main-mode-map " " my-root-map)
   (define-key mu4e-headers-mode-map " " my-root-map)
   (define-key mu4e-headers-mode-map "j" 'mu4e-headers-next)

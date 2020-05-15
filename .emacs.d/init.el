@@ -10,7 +10,7 @@
  '(ns-command-modifier (quote control))
  '(package-selected-packages
    (quote
-    (smooth-scrolling doom-themes humanoid-themes kaolin-themes company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
+    (perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
  '(tool-bar-mode nil))
 
 (custom-set-faces
@@ -72,18 +72,27 @@
 
 ; Basic keybinding are inspired by spacemacs
 (define-key my-root-map " " 'execute-extended-command)
+(define-key my-root-map (kbd "TAB") 'evil-switch-to-windows-last-buffer)
 (define-key my-root-map ":" 'eval-expression)
 (define-key my-root-map "'" 'eshell)
 (define-key my-root-map "!" 'shell-command)
 (define-key my-root-map "u" 'universal-argument)
 
+(define-key my-root-map "aC" 'calendar)
+(define-key my-root-map "ac" 'calc-dispatch)
+(define-key my-root-map "ap" 'list-processes)
+(define-key my-root-map "aP" 'proced)
 
 (define-key my-root-map "bb" 'switch-to-buffer)
 (define-key my-root-map "bd" 'kill-current-buffer)
+(define-key my-root-map "bD" 'kill-buffer-and-window)
 (define-key my-root-map "bk" 'kill-current-buffer)
 (define-key my-root-map "bn" 'next-buffer)
 (define-key my-root-map "bp" 'previous-buffer)
 (define-key my-root-map "br" 'revert-buffer)
+(define-key my-root-map "bs" (lambda ()
+			       (interactive)
+			       (switch-to-buffer "*scratch*")))
 
 (define-key my-root-map "ff" 'find-file)
 (define-key my-root-map "fr" 'recentf-open-files)
@@ -112,6 +121,10 @@
 (define-key my-root-map "sg" 'find-grep)
 (define-key my-root-map "ss" 'find-grep)
 
+(define-key my-root-map "tf" 'auto-fill-mode)
+(define-key my-root-map "tl" 'toggle-truncate-lines)
+(define-key my-root-map "tn" 'linum-mode)
+
 (define-key my-root-map "w=" 'balance-windows)
 (define-key my-root-map "wd" 'delete-window)
 (define-key my-root-map "wD" 'kill-buffer-and-window)
@@ -124,12 +137,16 @@
 (define-key my-root-map "wJ" 'evil-window-move-very-bottom)
 (define-key my-root-map "wK" 'evil-window-move-very-top)
 (define-key my-root-map "wL" 'evil-window-move-far-right)
-(define-key my-root-map "wm" 'delete-other-windows)
+(define-key my-root-map "wm" 'maximize-window)
 (define-key my-root-map "ws" 'split-window-vertically)
 (define-key my-root-map "wv" 'split-window-horizontally)
 (define-key my-root-map "ww" 'other-window)
 
 (evil-define-key 'motion 'global (kbd "<leader>") my-root-map)
+
+;; undo for windows
+(winner-mode)
+(define-key my-root-map "wu" 'winner-undo)
 
 ;; calendar
 (evil-collection-init 'calendar)
@@ -144,8 +161,8 @@
    (clojure . t)
    (shell . t)
    (emacs-lisp . nil)))
-(define-key org-mode-map (kbd "<localleader> ,") 'org-ctrl-c-ctrl-c)
-(define-key org-mode-map (kbd "<localleader> /") 'org-sparse-tree)
+(evil-define-key 'normal org-mode-map (kbd "<localleader> ,") 'org-ctrl-c-ctrl-c)
+(evil-define-key 'normal org-mode-map (kbd "<localleader> /") 'org-sparse-tree)
 
 (defun my-bind-basic-motion (map)
   (define-key map "j" 'next-line)
@@ -161,8 +178,10 @@
   (define-key map "gg" 'beginning-of-buffer)
   (define-key map "G" 'end-of-buffer))
 
+;; Emacs child processes
+(evil-set-initial-state 'process-menu-mode 'motion)
+
 ;; Proced
-(define-key my-root-map "ap" 'proced)
 (with-eval-after-load 'proced
   (define-key proced-mode-map " " my-root-map)
   (my-bind-basic-motion proced-mode-map)
@@ -191,9 +210,9 @@
   (define-key custom-mode-map "k" 'widget-backward))
 
 ;; Emacs lisp
-(define-key emacs-lisp-mode-map (kbd "<localleader> f") 'eval-defun)
-(define-key emacs-lisp-mode-map (kbd "<localleader> r") 'eval-region)
-(define-key emacs-lisp-mode-map (kbd "<localleader> b") 'eval-buffer)
+(evil-define-key 'normal emacs-lisp-mode-map (kbd "<localleader> f") 'eval-defun)
+(evil-define-key 'normal emacs-lisp-mode-map (kbd "<localleader> r") 'eval-region)
+(evil-define-key 'normal emacs-lisp-mode-map (kbd "<localleader> b") 'eval-buffer)
 
 ;; man
 (evil-define-key 'motion Man-mode-map (kbd "TAB") 'forward-button)
@@ -203,6 +222,32 @@
 (evil-define-key 'motion Man-mode-map "[[" 'Man-previous-section)
 (evil-define-key 'motion Man-mode-map "[]" 'Man-previous-section)
 
+;; Help
+(evil-define-key 'motion help-mode-map (kbd "TAB") 'forward-button)
+
+
+;; docview
+(with-eval-after-load 'doc-view
+  (define-key doc-view-mode-map " " my-root-map)
+  (define-key doc-view-mode-map "j" 'doc-view-next-page)
+  (define-key doc-view-mode-map "k" 'doc-view-previous-page)
+  (define-key doc-view-mode-map "g" 'nil)
+  (define-key doc-view-mode-map "gr" 'doc-view-revert-buffer)
+  (define-key doc-view-mode-map "gg" 'doc-view-first-page)
+  (define-key doc-view-mode-map "G" 'doc-view-last-page)
+  (define-key doc-view-mode-map "/" 'doc-view-search)
+  (define-key doc-view-mode-map "n" 'doc-view-search-next-match)
+  (define-key doc-view-mode-map "N" 'doc-view-search-previous-match))
+
+
+;; image
+(evil-set-initial-state 'image-mode 'emacs)
+(with-eval-after-load 'image-mode
+  (define-key image-mode-map " " my-root-map)
+  (define-key image-mode-map "j" 'image-scroll-up)
+  (define-key image-mode-map "k" 'image-scroll-down)
+  (define-key image-mode-map "h" 'image-scroll-rigth)
+  (define-key image-mode-map "l" 'image-scroll-left))
  
 ;; ag
 (define-key my-root-map "sf" 'ag-dired)
@@ -272,6 +317,11 @@
   (winum-mode))
 
 
+;; smooth scrolling
+(smooth-scrolling-mode 1)
+(setq smooth-scroll-margin 5)
+
+
 ;; which key
 (define-key my-root-map (kbd "h SPC") 'which-key-show-top-level)
 (which-key-mode)
@@ -288,10 +338,32 @@
 
 ;; company
 (global-company-mode)
+(define-key company-active-map (kbd "C-j") 'company-select-next)
+(define-key company-active-map (kbd "C-k") 'company-select-previous)
 
-;; smooth scrolling
-(smooth-scrolling-mode 1)
 
+;; layouts with perspective
+;; Switching layou function cannot be autoloaded
+;; and we cannot load perspective lazily
+;; so we use this hack to at least turn on
+;; perspective mode with familiar keybinding
+(define-key my-root-map "l" 'persp-mode)
+(with-eval-after-load 'perspective
+
+  (if (featurep 'ivy-rich)
+      (let ((cmd 'persp-ivy-switch-buffer)
+	    (props (plist-get ivy-rich-display-transformers-list 'ivy-switch-buffer)))
+	(ivy-set-display-transformer cmd (ivy-rich-build-transformer cmd props))))
+
+  (if (featurep 'ivy)
+      (define-key my-root-map "bb" 'persp-ivy-switch-buffer))
+
+  (define-key my-root-map "l" nil)
+  (define-key my-root-map "ll" 'persp-switch)
+  (define-key my-root-map (kbd "l TAB") 'persp-switch-last)
+  (define-key my-root-map "ld" 'persp-kill)
+  (define-key my-root-map "la" 'persp-add-buffer)
+  (define-key my-root-map "lr" 'persp-remove-buffer))
 
 
 ;; python
@@ -300,39 +372,78 @@
 (setq python-shell-interpreter "ipython"
       python-shell-interpreter-args "-i --simple-prompt"
       exec-path (add-to-list 'exec-path (expand-file-name "~/.pyenv/shims")))
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> c") 'elpy-config)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> d") 'elpy-doc)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> g g") 'elpy-goto-definition)
+(evil-define-key 'normal elpy-mode-map (kbd "RET") 'elpy-goto-definition)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> g G") 'elpy-goto-definition-other-window)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> g a") 'elpy-goto-definition)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> s s") 'elpy-shell-switch-to-shell)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> s f") 'elpy-shell-send-defun)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> s F") 'elpy-shell-send-defun-and-go)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> s b") 'elpy-shell-send-buffer)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> s B") 'elpy-shell-send-buffer-and-go)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> s r") 'elpy-shell-send-region-or-buffer)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> s R") 'elpy-shell-send-region-or-buffer-and-go)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> S n") 'elpy-flymake-next-error)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> S p") 'elpy-flymake-previous-error)
+
 (with-eval-after-load 'elpy
-  (define-key elpy-mode-map (kbd "<localleader> c") 'elpy-config)
-  (define-key elpy-mode-map (kbd "<localleader> d") 'elpy-doc)
-  (define-key elpy-mode-map (kbd "<localleader> g g") 'elpy-goto-definition)
-  (define-key elpy-mode-map (kbd "<localleader> g G") 'elpy-goto-definition-other-window)
-  (define-key elpy-mode-map (kbd "<localleader> g a") 'elpy-goto-definition)
-  (define-key elpy-mode-map (kbd "<localleader> s s") 'elpy-shell-switch-to-shell)
-  (define-key elpy-mode-map (kbd "<localleader> s f") 'elpy-shell-send-defun)
-  (define-key elpy-mode-map (kbd "<localleader> s F") 'elpy-shell-send-defun-and-go)
-  (define-key elpy-mode-map (kbd "<localleader> s b") 'elpy-shell-send-buffer)
-  (define-key elpy-mode-map (kbd "<localleader> s B") 'elpy-shell-send-buffer-and-go)
-  (define-key elpy-mode-map (kbd "<localleader> s r") 'elpy-shell-send-region-or-buffer)
-  (define-key elpy-mode-map (kbd "<localleader> s R") 'elpy-shell-send-region-or-buffer-and-go)
-  (define-key elpy-mode-map (kbd "<localleader> S n") 'elpy-flymake-next-error)
-  (define-key elpy-mode-map (kbd "<localleader> S p") 'elpy-flymake-previous-error)
   (elpy-enable))
+
+(defun enable-elpy-reload-buffer ()
+    (interactive)
+    ;; For some reason autoloading elpy upon opening first python buffer
+    ;; doesn't apply <localleader> keymaps correctly
+    ;; So by now just ugly hack with buffer reverting
+    (unless (and (boundp 'elpy-enabled-p) (symbol-value 'elpy-enabled-p))
+      (elpy-enable)
+      (revert-buffer nil t)))
+
 (with-eval-after-load 'python
-  (add-hook 'python-mode-hook 'elpy-enable))
+  (add-hook 'python-mode-hook 'enable-elpy-reload-buffer))
 
 ;; mu4e
 (load "~/.emacs.d/mu4e.el")
 
-;; TODO second "SPC w m" must restore the layout
-;; TODO layouts (persp mode)
+(server-start)
 ;; TODO org mode keybindings
 ;; TODO clojure mode (smartparens?)
-;; TODO image mode
-;; TODO pdf mode
-;; TODO docview mode
+;; TODO tune thumbnails mode
 ;; TODO sql repl
 ;; TODO setup eshell
 ;; TODO check out hydra (ivy-hydra)
 ;; TODO folding
-;; TODO toggles
 ;; TODO keybindings in magit commit buffer
-;; TODO personal data, mail accounts etc. in separate file
+;; TODO open in browser for mu4e
+;; TODO pdf mode (check out pdf tools)
+;; Themes to consider:
+;;   wombat (встроенная, чуть менее контрастно чем dakrone, но меньше цветов)
+;;   doom-city-lights (средний контраст, разноцветная)
+;;   doom-gruvbox (приятная, теплая менее контрастная чем monokai)
+;;   doom-henna (средний контраст, зеленый, голубой) ++
+;;   doom-laserwave (интересная тема пурпурного оттенка)
+;;   doom-material (очень неплохо на среднем контрасте)
+;;   doom-monokai-pro (чуть менее контрастная чем классический monokai)
+;;   doom-one (очень неплохо на среднем контрасте)
+;;   doom-opera (еще один интересный вариант на слабом контрасте)
+;;   doom-palenight (средний контраст, неброско)
+;;   doom-peacock (теплая, без броских цветов как в monokai) ++
+;;   doom-solarized-dark and light (выглядит вроде получше классических) 
+;;   doom-space-gray (еще одна слабоконтрастная с неплохой гаммой) ++
+;;   doom-tomorrow-night (среднеконтрастная)
+;;   doom-vibrant (средний контраст, неброские цвета, нелохая альтернатива dakrone)
+;;   doom-wilmersdorf (еще одна слабоконтрастная с неплохой прохладной гаммой)
+;;   humanoid-dark (средний контраст, синезеленоголубая с морскими оттенками) ++
+;;   kaolin-blossom (коричнево-пурпурно)
+;;   kaolin-bubblegum (контраст, фиолетово-бирюзовый)
+;;   kaolin-dark (слабый контраст едва различимые оттенки зеленого)
+;;   kaolin-eclipse (как blossom, только холоднее)
+;;   kaolin-galaxy (контраст, бирюзовый и пурпурный)
+;;   kaolin-mono-dark (слабый контраст, оттенки бирюзового)
+;;   kaolin-ocean (контраст, разноцветная и прохладная)
+;;   kaolin-temple (похожа на vim'овский desert)
+;;   kaolin-valley-dark (похожа на ocean, только теплее)
+;;   adwaita (светлая, если хочется серого фона, встроенная)
+;;   deeper-blue (разноцветненько, встроенная)
+;;   misterioso, tango-dark (тепло, разноцветно, но цвета коментов и строк непрактичные)
