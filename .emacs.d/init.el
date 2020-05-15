@@ -1,28 +1,7 @@
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(ediff-split-window-function (quote split-window-horizontally))
- '(evil-flash-delay 8)
- '(evil-symbol-word-search t)
- '(inhibit-startup-screen t)
- '(ns-command-modifier (quote control))
- '(package-selected-packages
-   (quote
-    (perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
- '(tool-bar-mode nil))
-
-(custom-set-faces
- ;; custom-set-faces was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- )
-
 ;; Common vars
 (setq user-full-name "First Last"
       ispell-dictionary "english"
+      ns-command-modifier 'control
       calendar-week-start-day 1
       calendar-date-style "european"
       calendar-day-name-array ["Вс" "Пн" "Вт" "Ср" "Чт" "Пт" "Сб"]
@@ -39,6 +18,7 @@
   (set-frame-font "Monaco-10" nil t)
   (setq exec-path (append exec-path '("/usr/local/bin"))))
 
+(setq inhibit-startup-screen t)
 (scroll-bar-mode -1)
 
 ;; Package initialization
@@ -58,6 +38,8 @@
 ;; Unmap "SPC" so that it can be used by evil motion map
 (define-key special-mode-map (kbd "SPC") nil)
 (define-key Info-mode-map (kbd "SPC") nil)
+(setq-default evil-symbol-word-search t)
+(setq evil-flash-delay 8)
 (setq evil-want-integration t)
 (setq evil-want-keybinding nil)
 (require 'evil)
@@ -161,8 +143,19 @@
    (clojure . t)
    (shell . t)
    (emacs-lisp . nil)))
+(evil-define-key 'normal org-mode-map "t" 'org-todo)
+(evil-define-key 'normal org-mode-map "<" 'org-metaleft)
+(evil-define-key 'normal org-mode-map ">" 'org-metaright)
 (evil-define-key 'normal org-mode-map (kbd "<localleader> ,") 'org-ctrl-c-ctrl-c)
 (evil-define-key 'normal org-mode-map (kbd "<localleader> /") 'org-sparse-tree)
+(evil-define-key 'normal org-mode-map (kbd "<localleader> .") 'org-time-stamp)
+(evil-define-key 'normal org-mode-map (kbd "<localleader> a") 'org-agenda)
+(evil-define-key 'normal org-mode-map (kbd "<localleader> A") 'org-archive-subtree)
+(evil-define-key 'normal org-mode-map (kbd "<localleader> d") 'org-deadline)
+(evil-define-key 'normal org-mode-map (kbd "<localleader> s") 'org-schedule)
+(evil-define-key 'normal org-mode-map (kbd "<localleader> n") 'org-narrow-to-subtree)
+(evil-define-key 'normal org-mode-map (kbd "<localleader> N") 'widen)
+(evil-define-key 'normal org-mode-map (kbd "<localleader> p") 'org-set-property)
 
 (defun my-bind-basic-motion (map)
   (define-key map "j" 'next-line)
@@ -248,6 +241,18 @@
   (define-key image-mode-map "k" 'image-scroll-down)
   (define-key image-mode-map "h" 'image-scroll-rigth)
   (define-key image-mode-map "l" 'image-scroll-left))
+
+
+;; ediff
+(setq ediff-split-window-function 'split-window-horizontally)
+(setq ediff-window-setup-function 'ediff-setup-windows-plain)
+;; It is not that simple :(
+;(defun evilify-ediff-a-bit ()
+;  (define-key ediff-mode-map "gj" 'ediff-jump-to-difference)
+;  (define-key ediff-mode-map "j" 'ediff-next-difference)
+;  (define-key ediff-mode-map "k" 'ediff-previous-difference)
+;  )
+;(add-hook 'ediff-keymap-setup-hook 'evilify-ediff-a-bit)
  
 ;; ag
 (define-key my-root-map "sf" 'ag-dired)
@@ -358,6 +363,9 @@
   (if (featurep 'ivy)
       (define-key my-root-map "bb" 'persp-ivy-switch-buffer))
 
+  (add-to-list 'mu4e-view-actions
+	       '("View in browser" . mu4e-action-view-in-browser) t)
+
   (define-key my-root-map "l" nil)
   (define-key my-root-map "ll" 'persp-switch)
   (define-key my-root-map (kbd "l TAB") 'persp-switch-last)
@@ -378,7 +386,7 @@
 (evil-define-key 'normal elpy-mode-map (kbd "RET") 'elpy-goto-definition)
 (evil-define-key 'normal elpy-mode-map (kbd "<localleader> g G") 'elpy-goto-definition-other-window)
 (evil-define-key 'normal elpy-mode-map (kbd "<localleader> g a") 'elpy-goto-definition)
-(evil-define-key 'normal elpy-mode-map (kbd "<localleader> s s") 'elpy-shell-switch-to-shell)
+(evil-define-key 'normal elpy-mode-map (kbd "<localleader> '") 'elpy-shell-switch-to-shell)
 (evil-define-key 'normal elpy-mode-map (kbd "<localleader> s f") 'elpy-shell-send-defun)
 (evil-define-key 'normal elpy-mode-map (kbd "<localleader> s F") 'elpy-shell-send-defun-and-go)
 (evil-define-key 'normal elpy-mode-map (kbd "<localleader> s b") 'elpy-shell-send-buffer)
@@ -415,8 +423,8 @@
 ;; TODO check out hydra (ivy-hydra)
 ;; TODO folding
 ;; TODO keybindings in magit commit buffer
-;; TODO open in browser for mu4e
 ;; TODO pdf mode (check out pdf tools)
+;; TODO ediff keybindings and floating window
 ;; Themes to consider:
 ;;   wombat (встроенная, чуть менее контрастно чем dakrone, но меньше цветов)
 ;;   doom-city-lights (средний контраст, разноцветная)
@@ -447,3 +455,22 @@
 ;;   adwaita (светлая, если хочется серого фона, встроенная)
 ;;   deeper-blue (разноцветненько, встроенная)
 ;;   misterioso, tango-dark (тепло, разноцветно, но цвета коментов и строк непрактичные)
+
+
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages
+   (quote
+    (perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
+ '(tool-bar-mode nil)
+ )
+
+(custom-set-faces
+ ;; custom-set-faces was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ )
