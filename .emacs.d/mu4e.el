@@ -52,7 +52,7 @@
 			    (:from-or-to . 24)
 			    (:subject)))
 
-(define-key my-root-map "amm" 'mu4e)
+(define-key lesser-evil-leader-map "amm" 'mu4e)
 
 (with-eval-after-load 'mu4e
 
@@ -62,15 +62,18 @@
   (setq mu4e-completing-read-function 'ivy-read)
   (mu4e-alert-enable-mode-line-display)
 
+  (add-to-list 'mu4e-view-actions
+	       '("View in browser" . mu4e-action-view-in-browser) t)
+
   ;; Binding fixed
-  (define-key my-root-map "amu" (lambda ()
+  (define-key lesser-evil-leader-map "amu" (lambda ()
 				  (interactive)
 				  (mu4e-headers-search-bookmark "flag:unread AND NOT flag:trashed")))
-  (define-key my-root-map "ams" 'mu4e-headers-search)
-  (define-key my-root-map "amj" 'mu4e~headers-jump-to-maildir)
-  (define-key my-root-map "amc" 'mu4e-compose-new)
-  (define-key mu4e-main-mode-map " " my-root-map)
-  (define-key mu4e-headers-mode-map " " my-root-map)
+  (define-key lesser-evil-leader-map "ams" 'mu4e-headers-search)
+  (define-key lesser-evil-leader-map "amj" 'mu4e~headers-jump-to-maildir)
+  (define-key lesser-evil-leader-map "amc" 'mu4e-compose-new)
+  (define-key mu4e-main-mode-map " " lesser-evil-leader-map)
+  (define-key mu4e-headers-mode-map " " lesser-evil-leader-map)
   (define-key mu4e-headers-mode-map "j" 'mu4e-headers-next)
   (define-key mu4e-headers-mode-map "k" 'mu4e-headers-prev)
   (define-key mu4e-headers-mode-map (kbd "C-f") 'evil-scroll-page-down)
