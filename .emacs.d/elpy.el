@@ -32,4 +32,6 @@
   (elpy-enable))
 
 (with-eval-after-load 'python
+  (pyenv-mode)
+  (require 'pyenv-mode-auto)
   (add-hook 'python-mode-hook 'elpy-enable))

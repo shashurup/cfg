@@ -129,6 +129,9 @@
 
 ;; org
 (add-hook 'org-mode-hook #'org-bullets-mode)
+(add-hook 'org-mode-hook 'evil-org-mode)
+(with-eval-after-load 'evil-org
+  (evil-org-set-key-theme '(textobjects)))
 (setq org-confirm-babel-evaluate nil)
 (org-babel-do-load-languages
  'org-babel-load-languages
@@ -138,6 +141,14 @@
    (restclient . t)
    (shell . t)
    (emacs-lisp . nil)))
+(defun lesser-evil-org-goto-scratch ()
+  (interactive)
+  (org-babel-goto-named-src-block "scratch")
+  )
+(defun lesser-evil-org-dup-src-code ()
+  (interactive)
+  (execute-kbd-macro "vaeyP[[")
+  )
 (evil-define-key 'normal org-mode-map
   "t" 'org-todo
   "<" 'org-metaleft
@@ -151,7 +162,10 @@
   (kbd "<localleader> s") 'org-schedule
   (kbd "<localleader> n") 'org-narrow-to-subtree
   (kbd "<localleader> N") 'widen
-  (kbd "<localleader> p") 'org-set-property)
+  (kbd "<localleader> p") 'org-set-property
+  (kbd "<localleader> c c") 'lesser-evil-org-goto-scratch
+  (kbd "<localleader> c d") 'lesser-evil-org-dup-src-code
+  )
 
 (defun my-bind-basic-motion (map)
   (define-key map "j" 'next-line)
@@ -324,10 +338,10 @@
 
 ;; HideShow
 (evil-define-key 'normal 'hs-minor-mode
-  (kbd "<localleader>tt") 'hs-toggle-hiding
-  (kbd "<localleader>ta") 'hs-hide-all
-  (kbd "<localleader>tA") 'hs-show-all
-  (kbd "<localleader>tl") 'hs-hide-level)
+  (kbd "<localleader>zz") 'hs-toggle-hiding
+  (kbd "<localleader>zA") 'hs-hide-all
+  (kbd "<localleader>za") 'hs-show-all
+  (kbd "<localleader>zl") 'hs-hide-level)
 ;; support for xml folding
 (add-to-list 'hs-special-modes-alist
              '(nxml-mode
@@ -535,8 +549,7 @@
       (apply 'which-key-add-key-based-replacements (cdr kd))))
 
 
-;; TODO org mode keybindings for dealing with code blocks
 ;; TODO sql repl establish connection by postgre connection string
-;; TODO folding
 ;; TODO pdf mode (check out pdf tools)
 ;; TODO ediff keybindings and floating window
+;; TODO eww keys
