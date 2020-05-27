@@ -29,6 +29,24 @@
   (kbd "C-j") 'cider-repl-next-input
   (kbd "C-k") 'cider-repl-previous-input)
 
+(evil-set-initial-state 'cider-stacktrace-mode 'motion)
+(evil-define-key 'motion cider-stacktrace-mode-map
+  (kbd "TAB") 'cider-stacktrace-cycle-current-cause
+  "J" 'cider-stacktrace-toggle-java)
+
+(evil-set-initial-state 'cider-repl-history-mode 'motion)
+(evil-define-key 'motion cider-repl-history-mode-map
+  (kbd "RET") 'cider-repl-history-insert-and-quit
+  "j" 'cider-repl-history-forward
+  "k" 'cider-repl-history-previous)
+
+
+;; TODO cider-macroexpansion-mode-map
+;; TODO cider-connections-buffer-mode-map
+;; TODO cider-inspector-mode-map
+;; TODO cider--debug-mode-map
+;; TODO cider-test-report-mode-map
+
 (push '(clojure-mode
 	"<localleader>e" "eval"
 	"<localleader>h" "help"

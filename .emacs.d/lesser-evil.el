@@ -1,4 +1,10 @@
 ;; core
+
+(defmacro make-interactive (fn &rest args)
+  `(lambda ()
+     (interactive)
+     ,(cons fn args)))
+
 ;; Input method toggling by caps mapped to F19
 (global-set-key (kbd "<f19>") 'toggle-input-method)
 ;; Unmap "SPC" so that it can be used by evil motion map
@@ -38,9 +44,7 @@
 (define-key lesser-evil-leader-map "bn" 'next-buffer)
 (define-key lesser-evil-leader-map "bp" 'previous-buffer)
 (define-key lesser-evil-leader-map "br" 'revert-buffer)
-(define-key lesser-evil-leader-map "bs" (lambda ()
-			       (interactive)
-			       (switch-to-buffer "*scratch*")))
+(define-key lesser-evil-leader-map "bs" (make-interactive switch-to-buffer "*scratch*"))
 
 (define-key lesser-evil-leader-map "ff" 'find-file)
 (define-key lesser-evil-leader-map "fr" 'recentf-open-files)
@@ -97,7 +101,7 @@
   ("j" shrink-window "shrink window")
   ("k" enlarge-window "enlarge window")
   ("h" shrink-window-horizontally "shrink window horizontally")
-  ("}" enlarge-window-horizontally "enlarge window horizontally"))
+  ("l" enlarge-window-horizontally "enlarge window horizontally"))
 
 (evil-define-key 'motion 'global (kbd "<leader>") lesser-evil-leader-map)
 
@@ -141,14 +145,6 @@
    (restclient . t)
    (shell . t)
    (emacs-lisp . nil)))
-(defun lesser-evil-org-goto-scratch ()
-  (interactive)
-  (org-babel-goto-named-src-block "scratch")
-  )
-(defun lesser-evil-org-dup-src-code ()
-  (interactive)
-  (execute-kbd-macro "vaeyP[[")
-  )
 (evil-define-key 'normal org-mode-map
   "t" 'org-todo
   "<" 'org-metaleft
@@ -163,8 +159,15 @@
   (kbd "<localleader> n") 'org-narrow-to-subtree
   (kbd "<localleader> N") 'widen
   (kbd "<localleader> p") 'org-set-property
-  (kbd "<localleader> c c") 'lesser-evil-org-goto-scratch
-  (kbd "<localleader> c d") 'lesser-evil-org-dup-src-code
+  (kbd "<localleader> c c") (make-interactive org-babel-goto-named-src-block "scratch")
+  (kbd "<localleader> c d") (make-interactive execute-kbd-macro "vaeyP[[")
+  (kbd "<localleader>tc") 'org-table-insert-column
+  (kbd "<localleader>td") 'org-table-delete-column
+  (kbd "<localleader>th") 'org-table-move-column-left
+  (kbd "<localleader>tl") 'org-table-move-column-right
+  (kbd "<localleader>ts") 'org-table-insert-hline
+  (kbd "<localleader>t?") 'org-table-field-info
+  (kbd "<localleader>t,") 'org-table-recalculate
   )
 
 (defun my-bind-basic-motion (map)
@@ -202,9 +205,7 @@
   (my-bind-basic-motion dired-mode-map)
   (define-key dired-mode-map "J" 'dired-goto-file)
   (define-key dired-mode-map "K" 'dired-do-kill-lines)
-  (define-key dired-mode-map "I" (lambda () "Image dired"
-				   (interactive)
-				   (image-dired ".")))
+  (define-key dired-mode-map "I" (make-interactive image-dired "."))
   (define-key dired-mode-map "gr" 'revert-buffer)
   (define-key dired-mode-map "gf" 'dired-goto-file)
   (define-key dired-mode-map "gG" 'dired-do-chgrp))
@@ -255,6 +256,10 @@
 
 ;; Help
 (evil-define-key 'motion help-mode-map (kbd "TAB") 'forward-button)
+
+
+;; apropos
+(evil-define-key 'motion apropos-mode-map (kbd "TAB") 'forward-button)
 
 
 ;; docview
@@ -358,6 +363,14 @@
 ;      lesser-evil-keys-desc)
 
 
+;; eww
+(evil-set-initial-state 'eww-mode 'motion)
+(evil-define-key 'motion eww-mode-map
+  (kbd "TAB") 'shr-next-link
+  "H" 'eww-back-url
+  "L" 'eww-forward-url
+  "gr" 'eww-reload)
+
 ;;======================================================================
 
 ;; 3rd party stuff
@@ -383,10 +396,13 @@
 (define-key ivy-minibuffer-map (kbd "C-j") nil)
 (define-key ivy-switch-buffer-map (kbd "C-k") nil)
 (define-key ivy-switch-buffer-map (kbd "C-w") 'ivy-switch-buffer-kill)
-
-(defun counsel-ag-with-thing-at-point ()
-  (interactive)
-  (counsel-ag (ivy-thing-at-point)))
+(evil-set-initial-state 'ivy-occur-mode 'emacs)
+(define-key ivy-occur-mode-map " " lesser-evil-leader-map)
+(define-key ivy-occur-mode-map (kbd "C-f") 'scroll-up)
+(define-key ivy-occur-mode-map (kbd "C-b") 'scroll-down)
+(define-key ivy-occur-mode-map "G" 'end-of-buffer)
+(define-key ivy-occur-mode-map "g" nil)
+(define-key ivy-occur-mode-map "gg" 'beginning-of-buffer)
 
 ;(defun counsel-ag-ask-dir (dir)
 ;  (interactive)
@@ -400,7 +416,8 @@
 (define-key lesser-evil-leader-map "hdv" 'counsel-describe-variable)
 (define-key lesser-evil-leader-map "hdk" 'counsel-descbinds)
 (define-key lesser-evil-leader-map "sb" 'swiper-thing-at-point)
-(define-key lesser-evil-leader-map "sd" 'counsel-ag-with-thing-at-point)
+(define-key lesser-evil-leader-map "sd" (make-interactive counsel-ag
+							  (ivy-thing-at-point)))
 (define-key lesser-evil-leader-map "ss" 'swiper-thing-at-point)
 (push '(nil
 	"<leader>sb" "current buffer"
@@ -427,6 +444,23 @@
 
 
 ;; winum
+(defun lesser-evil-find-window (w1 w2 num)
+  (when w2
+    (if (eq w1 w2)
+	num
+      (lesser-evil-find-window w1
+			       (window-in-direction 'right w2)
+			       (1+ num)))))
+
+;; Assign window numbers left to right first
+(defun lesser-evil-window-num ()
+  (lesser-evil-find-window (selected-window) (frame-first-window) 1))
+
+(defun lesser-evil-display-buffer-in (num)
+  (set-window-buffer (winum-get-window-by-number num)
+		     (current-buffer)))
+
+(define-key lesser-evil-leader-map "0" 'winum-select-window-0)
 (define-key lesser-evil-leader-map "1" 'winum-select-window-1)
 (define-key lesser-evil-leader-map "2" 'winum-select-window-2)
 (define-key lesser-evil-leader-map "3" 'winum-select-window-3)
@@ -436,8 +470,18 @@
 (define-key lesser-evil-leader-map "7" 'winum-select-window-7)
 (define-key lesser-evil-leader-map "8" 'winum-select-window-8)
 (define-key lesser-evil-leader-map "9" 'winum-select-window-9)
+(define-key lesser-evil-leader-map "b1" (make-interactive lesser-evil-display-buffer-in 1))
+(define-key lesser-evil-leader-map "b2" (make-interactive lesser-evil-display-buffer-in 2))
+(define-key lesser-evil-leader-map "b3" (make-interactive lesser-evil-display-buffer-in 3))
+(define-key lesser-evil-leader-map "b4" (make-interactive lesser-evil-display-buffer-in 4))
+(define-key lesser-evil-leader-map "b5" (make-interactive lesser-evil-display-buffer-in 5))
+(define-key lesser-evil-leader-map "b6" (make-interactive lesser-evil-display-buffer-in 6))
+(define-key lesser-evil-leader-map "b7" (make-interactive lesser-evil-display-buffer-in 7))
+(define-key lesser-evil-leader-map "b8" (make-interactive lesser-evil-display-buffer-in 8))
+(define-key lesser-evil-leader-map "b9" (make-interactive lesser-evil-display-buffer-in 9))
 (with-eval-after-load 'winum
-  (winum-mode))
+  (winum-mode)
+  (add-to-list 'winum-assign-functions #'lesser-evil-window-num))
 
 
 ;; smooth scrolling
@@ -454,6 +498,8 @@
 (define-key lesser-evil-leader-map "gb" 'magit-blame-addition)
 (define-key lesser-evil-leader-map "gm" 'magit-dispatch)
 (define-key lesser-evil-leader-map "gl" 'magit-log-buffer-file)
+(evil-define-key 'normal magit-mode-map
+  " " lesser-evil-leader-map)
 (evil-define-key 'normal with-editor-mode-map
   (kbd "<localleader> ,") 'with-editor-finish
   (kbd "<localleader> k") 'with-editor-cancel)
@@ -552,4 +598,5 @@
 ;; TODO sql repl establish connection by postgre connection string
 ;; TODO pdf mode (check out pdf tools)
 ;; TODO ediff keybindings and floating window
-;; TODO eww keys
+;; TODO moving buffer to another window winum window numbering
+;; TODO eshell cursor position in normal mode

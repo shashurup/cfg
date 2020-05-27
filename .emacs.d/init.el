@@ -2,6 +2,7 @@
 (setq user-full-name "First Last"
       ispell-dictionary "english"
       ns-command-modifier 'control
+      backup-directory-alist `(("." . ,(concat user-emacs-directory "backups")))
       calendar-week-start-day 1
       calendar-date-style "european"
       calendar-day-name-array ["Вс" "Пн" "Вт" "Ср" "Чт" "Пт" "Сб"]
@@ -20,6 +21,7 @@
 
 (setq inhibit-startup-screen t)
 (scroll-bar-mode -1)
+(setq visible-bell 1)
 
 ;; Package initialization
 (require 'package)
@@ -29,6 +31,7 @@
 (setq package-enable-at-startup nil)
 
 ;; theme
+(setq doom-henna-brighter-modeline t)
 (load-theme 'doom-henna t)
 
 (load (concat user-emacs-directory "lesser-evil.el"))
@@ -43,7 +46,7 @@
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
    (quote
-    (evil-org evil-text-object-python restclient hydra cider smartparens perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
+    (markdown-mode ivy-hydra evil-org evil-text-object-python restclient hydra cider smartparens perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
  '(tool-bar-mode nil))
 
 (custom-set-faces

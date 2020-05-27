@@ -1,5 +1,6 @@
 
 ;; TODO pyenv shim path for child processes
+(setenv "PATH" (concat (expand-file-name "~/.pyenv/shims") ":" (getenv "PATH")))
 (setq python-shell-interpreter "ipython"
       python-shell-interpreter-args "-i --simple-prompt"
       exec-path (add-to-list 'exec-path (expand-file-name "~/.pyenv/shims")))
