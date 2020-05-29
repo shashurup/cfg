@@ -11,17 +11,11 @@
 				 "Октябрь" "Ноябрь" "Декабрь"])
 
 ;; Appearence
-(when (eq system-type 'gnu/linux)
-  (menu-bar-mode -99)
-  (set-frame-font "Monospace-6" nil t))
-
-(when (eq system-type 'darwin)
-  (set-frame-font "Monaco-10" nil t)
-  (setq exec-path (append exec-path '("/usr/local/bin"))))
-
 (setq inhibit-startup-screen t)
+(menu-bar-mode -99)
 (scroll-bar-mode -1)
 (setq visible-bell 1)
+(column-number-mode)
 
 ;; Package initialization
 (require 'package)
@@ -29,6 +23,21 @@
 (package-initialize)
 ;; Do not initialize packages again after init
 (setq package-enable-at-startup nil)
+
+(defun set-comfortable-margins ()
+  (setq left-margin-width 1
+	right-margin-width 1)
+  (when-let ((w (get-buffer-window (current-buffer))))
+    (set-window-buffer w (current-buffer))))
+
+(with-eval-after-load 'info
+  (add-hook 'Info-mode-hook 'set-comfortable-margins))
+
+(with-eval-after-load 'help
+  (add-hook 'help-mode-hook 'set-comfortable-margins))
+
+(with-eval-after-load 'eww
+  (add-hook 'eww-mode-hook 'set-comfortable-margins))
 
 ;; theme
 (setq doom-henna-brighter-modeline t)
@@ -54,7 +63,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- )
+ '(default ((t (:height 60 :family "Monospace"))))
+ '(fixed-pitch-serif ((t (:height 1.1 :family "Linux Libertine Mono O"))))
+ '(variable-pitch ((t (:height 1.1 :family "Sans")))))
 
 
 ;; Themes to consider:

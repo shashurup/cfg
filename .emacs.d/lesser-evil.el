@@ -52,9 +52,11 @@
 
 (define-key lesser-evil-leader-map "hdf" 'describe-function)
 (define-key lesser-evil-leader-map "hdk" 'describe-key)
+(define-key lesser-evil-leader-map "hdf" 'describe-face)
 (define-key lesser-evil-leader-map "hdm" 'describe-mode)
 (define-key lesser-evil-leader-map "hdv" 'describe-variable)
 (define-key lesser-evil-leader-map "hdp" 'describe-package)
+(define-key lesser-evil-leader-map "ha" 'apropos)
 (define-key lesser-evil-leader-map "hi" 'info)
 (define-key lesser-evil-leader-map "hm" 'man)
 (define-key lesser-evil-leader-map "hr" 'info-emacs-manual)
@@ -128,6 +130,11 @@
 (winner-mode)
 (define-key lesser-evil-leader-map "wu" 'winner-undo)
 
+;; Info
+(evil-define-key 'motion Info-mode-map "n" 'evil-search-next)
+(evil-define-key 'motion Info-mode-map "gg" 'beginning-of-buffer)
+(evil-define-key 'motion Info-mode-map "gn" 'Info-goto-node)
+
 ;; calendar
 (evil-collection-init 'calendar)
 
@@ -145,30 +152,74 @@
    (restclient . t)
    (shell . t)
    (emacs-lisp . nil)))
+(setq org-local-leader-map (make-sparse-keymap))
 (evil-define-key 'normal org-mode-map
   "t" 'org-todo
   "<" 'org-metaleft
   ">" 'org-metaright
-  (kbd "<localleader> ,") 'org-ctrl-c-ctrl-c
-  (kbd "<localleader> /") 'org-sparse-tree
-  (kbd "<localleader> .") 'org-time-stamp
-  (kbd "<localleader> a") 'org-agenda
-  (kbd "<localleader> A") 'org-archive-subtree
-  (kbd "<localleader> d") 'org-deadline
-  (kbd "<localleader> s") 'org-schedule
-  (kbd "<localleader> n") 'org-narrow-to-subtree
-  (kbd "<localleader> N") 'widen
-  (kbd "<localleader> p") 'org-set-property
-  (kbd "<localleader> c c") (make-interactive org-babel-goto-named-src-block "scratch")
-  (kbd "<localleader> c d") (make-interactive execute-kbd-macro "vaeyP[[")
-  (kbd "<localleader>tc") 'org-table-insert-column
-  (kbd "<localleader>td") 'org-table-delete-column
-  (kbd "<localleader>th") 'org-table-move-column-left
-  (kbd "<localleader>tl") 'org-table-move-column-right
-  (kbd "<localleader>ts") 'org-table-insert-hline
-  (kbd "<localleader>t?") 'org-table-field-info
-  (kbd "<localleader>t,") 'org-table-recalculate
-  )
+  (kbd "<localleader>") org-local-leader-map)
+(with-eval-after-load 'org
+  (define-key org-local-leader-map "," 'org-ctrl-c-ctrl-c)
+  (define-key org-local-leader-map "/" 'org-sparse-tree)
+  (define-key org-local-leader-map "." 'org-time-stamp)
+  (define-key org-local-leader-map "a" 'org-agenda)
+  (define-key org-local-leader-map "A" 'org-archive-subtree)
+  (define-key org-local-leader-map "d" 'org-deadline)
+  (define-key org-local-leader-map "s" 'org-schedule)
+  (define-key org-local-leader-map "n" 'org-narrow-to-subtree)
+  (define-key org-local-leader-map "N" 'widen)
+  (define-key org-local-leader-map "p" 'org-set-property)
+  (define-key org-local-leader-map "tc" 'org-table-insert-column)
+  (define-key org-local-leader-map "td" 'org-table-delete-column)
+  (define-key org-local-leader-map "th" 'org-table-move-column-left)
+  (define-key org-local-leader-map "tl" 'org-table-move-column-right)
+  (define-key org-local-leader-map "ts" 'org-table-insert-hline)
+  (define-key org-local-leader-map "t?" 'org-table-field-info)
+  (define-key org-local-leader-map "t," 'org-table-recalculate)
+  (defun lesser-evil-org-delete-src-block ()
+    (interactive)
+    (let ((pos (org-babel-where-is-src-block-head)))
+      (if pos
+	  (progn
+	    (goto-char pos)
+	    (org-babel-remove-result)
+	    (apply 'evil-delete (evil-org-an-object)))
+	(progn
+	  (org-babel-previous-src-block)
+	  (org-babel-remove-result)))))
+  (defun lesser-evil-org-yank-src-block ()
+    (interactive)
+    (if (not (org-babel-where-is-src-block-head))
+	(org-babel-previous-src-block))
+    (apply 'evil-yank (evil-org-an-object)))
+  (defun lesser-evil-org-paste-src-block-before ()
+    (interactive)
+    (goto-char (car (evil-org-an-object)))
+    (evil-paste-before 1))
+  (defun lesser-evil-org-paste-src-block-after ()
+    (interactive)
+    (if (not (org-babel-where-is-src-block-head))
+	(org-babel-previous-src-block))
+    (when-let ((pos (org-babel-where-is-src-block-result)))
+      (goto-char pos)
+      (goto-char (nth 1 (evil-org-an-object)))
+      (evil-paste-before 1)))
+  (defun lesser-evil-org-goto-scratch-src-block ()
+    (interactive)
+    (org-babel-goto-named-src-block "scratch"))
+  (defhydra "org source code blocks" (org-local-leader-map "c")
+    ("," org-ctrl-c-ctrl-c "ctrl-c-ctrl-c")
+    ("<tab>" org-cycle "cycle")
+    ("j" org-babel-next-src-block "next block")
+    ("k" org-babel-previous-src-block "prev block")
+    ("J" org-forward-paragraph "next paragraph")
+    ("K" org-backward-paragraph "prev paragraph")
+    ("d" lesser-evil-org-delete-src-block "delete")
+    ("y" lesser-evil-org-yank-src-block "yank")
+    ("p" lesser-evil-org-paste-src-block-after "paste after")
+    ("P" lesser-evil-org-paste-src-block-before "paste before")
+    ("s" lesser-evil-org-goto-scratch-src-block  "scratch"))
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
 
 (defun my-bind-basic-motion (map)
   (define-key map "j" 'next-line)
@@ -394,6 +445,7 @@
 (ivy-rich-mode 1)
 ;; Unmap theese keys to allow global keys to be used for up/down
 (define-key ivy-minibuffer-map (kbd "C-j") nil)
+(define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-dispatching-done)
 (define-key ivy-switch-buffer-map (kbd "C-k") nil)
 (define-key ivy-switch-buffer-map (kbd "C-w") 'ivy-switch-buffer-kill)
 (evil-set-initial-state 'ivy-occur-mode 'emacs)
@@ -404,20 +456,50 @@
 (define-key ivy-occur-mode-map "g" nil)
 (define-key ivy-occur-mode-map "gg" 'beginning-of-buffer)
 
-;(defun counsel-ag-ask-dir (dir)
-;  (interactive)
-;  (counsel-ag (ivy-thing-at-point) dir))
+(defun counsel-ag-ask-dir ()
+  (interactive)
+  (counsel-ag
+   (ivy-thing-at-point)
+   (counsel-read-directory-name "ag in directory:")))
+
+(with-eval-after-load 'counsel
+  ;; this is just a modified copy of counsel function
+  ;; which uses other window
+  (defun counsel-git-grep-action-other-window (x)
+    "Go to occurrence X in current Git repository."
+    (when (string-match "\\`\\(.*?\\):\\([0-9]+\\):\\(.*\\)\\'" x)
+      (let ((file-name (match-string-no-properties 1 x))
+	    (line-number (match-string-no-properties 2 x)))
+	(find-file-other-window (expand-file-name
+				 file-name
+				 (ivy-state-directory ivy-last)))
+	(goto-char (point-min))
+	(forward-line (1- (string-to-number line-number)))
+	(when (re-search-forward (ivy--regex ivy-text t) (line-end-position) t)
+	  (when swiper-goto-start-of-match
+	    (goto-char (match-beginning 0))))
+	(swiper--ensure-visible)
+	(run-hooks 'counsel-grep-post-action-hook)
+	(unless (eq ivy-exit 'done)
+	  (swiper--cleanup)
+	  (swiper--add-overlays (ivy--regex ivy-text))))))
+
+    (ivy-add-actions 'counsel-ag
+		     '(("j" counsel-git-grep-action-other-window "other window")))
+  )
 
 (define-key lesser-evil-leader-map " " 'counsel-M-x)
 (define-key lesser-evil-leader-map "bb" 'ivy-switch-buffer)
 (define-key lesser-evil-leader-map "ff" 'counsel-find-file)
 (define-key lesser-evil-leader-map "fr" 'counsel-recentf)
+(define-key lesser-evil-leader-map "ha" 'counsel-apropos)
 (define-key lesser-evil-leader-map "hdf" 'counsel-describe-function)
 (define-key lesser-evil-leader-map "hdv" 'counsel-describe-variable)
 (define-key lesser-evil-leader-map "hdk" 'counsel-descbinds)
 (define-key lesser-evil-leader-map "sb" 'swiper-thing-at-point)
 (define-key lesser-evil-leader-map "sd" (make-interactive counsel-ag
 							  (ivy-thing-at-point)))
+(define-key lesser-evil-leader-map "sg" 'counsel-ag-ask-dir)
 (define-key lesser-evil-leader-map "ss" 'swiper-thing-at-point)
 (push '(nil
 	"<leader>sb" "current buffer"
