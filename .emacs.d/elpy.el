@@ -8,10 +8,10 @@
 (evil-define-key 'normal 'elpy-mode
   (kbd "<localleader> c") 'elpy-config
   (kbd "<localleader> h") 'elpy-doc
-  (kbd "<localleader> g g") 'elpy-goto-definition
-  (kbd "RET") 'elpy-goto-definition
-  (kbd "DEL") 'pop-tag-mark
-  (kbd "<localleader> g G") 'elpy-goto-definition-other-window
+  (kbd "<localleader> g d") 'elpy-goto-definition
+  (kbd "<localleader> g D") 'elpy-goto-definition-other-window
+  "gd" 'elpy-goto-definition
+  "gD" 'elpy-goto-definition-other-window
   (kbd "<localleader> g a") 'elpy-goto-definition
   (kbd "<localleader> '") 'elpy-shell-switch-to-shell
   (kbd "<localleader> s f") 'elpy-shell-send-defun

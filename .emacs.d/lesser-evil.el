@@ -14,6 +14,7 @@
 (setq evil-flash-delay 8)
 (setq evil-want-integration t)
 (setq evil-want-keybinding nil)
+(setq evil-move-beyond-eol t)
 (require 'evil)
 (evil-mode 1)
 (evil-global-set-key 'motion (kbd "SPC") nil)
@@ -74,6 +75,9 @@
 (define-key lesser-evil-leader-map "sd" 'find-dired)
 (define-key lesser-evil-leader-map "sg" 'find-grep)
 (define-key lesser-evil-leader-map "ss" 'occur)
+(define-key lesser-evil-leader-map "so" 'xref-find-definitions)
+(define-key lesser-evil-leader-map "sO" 'imenu)
+(define-key lesser-evil-leader-map "sr" 'xref-find-references)
 
 (define-key lesser-evil-leader-map "tf" 'auto-fill-mode)
 (define-key lesser-evil-leader-map "tl" 'toggle-truncate-lines)
@@ -422,6 +426,8 @@
   "L" 'eww-forward-url
   "gr" 'eww-reload)
 
+;; xref 
+(evil-set-initial-state 'xref--xref-buffer-mode 'motion)
 ;;======================================================================
 
 ;; 3rd party stuff
@@ -489,7 +495,7 @@
   )
 
 (define-key lesser-evil-leader-map " " 'counsel-M-x)
-(define-key lesser-evil-leader-map "bb" 'ivy-switch-buffer)
+(define-key lesser-evil-leader-map "bb" 'counsel-switch-buffer)
 (define-key lesser-evil-leader-map "ff" 'counsel-find-file)
 (define-key lesser-evil-leader-map "fr" 'counsel-recentf)
 (define-key lesser-evil-leader-map "ha" 'counsel-apropos)
@@ -501,6 +507,7 @@
 							  (ivy-thing-at-point)))
 (define-key lesser-evil-leader-map "sg" 'counsel-ag-ask-dir)
 (define-key lesser-evil-leader-map "ss" 'swiper-thing-at-point)
+(define-key lesser-evil-leader-map "so" 'counsel-imenu)
 (push '(nil
 	"<leader>sb" "current buffer"
 	"<leader>sd" "current directory"
@@ -611,8 +618,8 @@
 	    (props (plist-get ivy-rich-display-transformers-list 'ivy-switch-buffer)))
 	(ivy-set-display-transformer cmd (ivy-rich-build-transformer cmd props))))
 
-  (if (featurep 'ivy)
-      (define-key lesser-evil-leader-map "bb" 'persp-ivy-switch-buffer))
+  (if (featurep 'counsel)
+      (define-key lesser-evil-leader-map "bb" 'persp-counsel-switch-buffer))
 
   (define-key lesser-evil-leader-map "l" nil)
   (define-key lesser-evil-leader-map "ll" 'persp-switch)
@@ -669,6 +676,16 @@
 ;; mu4e
 (load (concat user-emacs-directory "mu4e.el"))
 
+;; ctags update
+(setq tags-add-tables nil)
+(defun lesser-evil-enable-ctags ()
+  (turn-on-ctags-auto-update-mode)
+  (when-let ((tf (ctags-update-find-tags-file)))
+    (visit-tags-table tf t)))
+
+(add-hook 'sql-mode-hook 'lesser-evil-enable-ctags)
+(add-hook 'java-mode-hook 'lesser-evil-enable-ctags)
+(add-hook 'ruby-mode-hook 'lesser-evil-enable-ctags)
 
 ;; apply keybindings descriptions to which-key
 (dolist (kd lesser-evil-keys-desc)
@@ -677,8 +694,7 @@
       (apply 'which-key-add-key-based-replacements (cdr kd))))
 
 
+;; xref window bindings
 ;; TODO sql repl establish connection by postgre connection string
 ;; TODO pdf mode (check out pdf tools)
 ;; TODO ediff keybindings and floating window
-;; TODO moving buffer to another window winum window numbering
-;; TODO eshell cursor position in normal mode

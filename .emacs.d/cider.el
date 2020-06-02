@@ -1,9 +1,19 @@
+(setq org-babel-clojure-backend 'cider)
 (add-hook 'clojure-mode-hook #'cider-mode)
+(setq cider-prompt-for-symbol nil)
 (evil-define-key 'normal 'cider-mode
   (kbd "<localleader> e r") 'cider-eval-region
   (kbd "<localleader> e f") 'cider-eval-defun-at-point
   (kbd "<localleader> e m") 'cider-macroexpand-1
+  (kbd "<localleader> e M") 'cider-macroexpand-all
   (kbd "<localleader> e e") 'cider-eval-sexp-at-point
+  (kbd "<localleader> e i") 'cider-inspector
+
+  "gd" 'cider-find-dwim
+  "gD" 'cider-find-dwim-other-window
+  (kbd "<localleader> g d") 'cider-find-dwim
+  (kbd "<localleader> g D") 'cider-find-dwim-other-window
+  (kbd "<localleader> g n") 'cider-find-ns
   
   (kbd "<localleader> h a") 'cider-apropos
   (kbd "<localleader> h h") 'cider-doc
@@ -40,12 +50,20 @@
   "j" 'cider-repl-history-forward
   "k" 'cider-repl-history-previous)
 
+(evil-set-initial-state 'cider-browse-ns-mode 'motion)
+(evil-define-key 'motion cider-browse-ns-mode-map
+  (kbd "RET") 'cider-browse-ns-operate-at-point
+  "q" 'cider-popup-buffer-quit-function)
 
-;; TODO cider-macroexpansion-mode-map
-;; TODO cider-connections-buffer-mode-map
-;; TODO cider-inspector-mode-map
+(evil-set-initial-state 'cider-inspector-mode 'motion)
+(evil-define-key 'motion cider-inspector-mode-map
+  (kbd "RET") 'cider-inspector-operate-on-point
+  (kbd "DEL") 'cider-inspector-pop
+  "gr" 'cider-inspector-refresh)
+
 ;; TODO cider--debug-mode-map
 ;; TODO cider-test-report-mode-map
+;; TODO cider-macroexpansion-mode-map
 
 (push '(clojure-mode
 	"<localleader>e" "eval"

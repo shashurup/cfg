@@ -43,9 +43,6 @@
       mu4e-context-policy 'ask-if-none
       mu4e-change-filenames-when-moving t
       mu4e-get-mail-command "sync-mail"
-      mu4e-user-mail-address-list '("name@example.com"
-				    "name@example.com"
-				    "name@example.com")
       mu4e-headers-fields '((:human-date . 12)
 			    (:flags . 6)
 			    ; (:maildir . 12)
