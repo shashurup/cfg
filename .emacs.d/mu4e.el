@@ -84,6 +84,10 @@
 
   (setq mu4e-contexts (my-mu4e-context))
 
+(push '(nil
+	"<leader>am" "mu4e"
+	) lesser-evil-keys-desc)
+
 ;; Fix opening attached eml files
 (defun mu4e~view-mark-as-read-maybe (msg)
   "Clear the message MSG New/Unread status and set it to Seen.

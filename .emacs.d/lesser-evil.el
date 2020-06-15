@@ -35,6 +35,9 @@
 
 (define-key lesser-evil-leader-map "aC" 'calendar)
 (define-key lesser-evil-leader-map "ac" 'calc-dispatch)
+(define-key lesser-evil-leader-map "adb" 'ediff-buffers)
+(define-key lesser-evil-leader-map "add" 'ediff-directories)
+(define-key lesser-evil-leader-map "adf" 'ediff-files)
 (define-key lesser-evil-leader-map "ap" 'list-processes)
 (define-key lesser-evil-leader-map "aP" 'proced)
 
@@ -50,6 +53,8 @@
 (define-key lesser-evil-leader-map "ff" 'find-file)
 (define-key lesser-evil-leader-map "fr" 'recentf-open-files)
 (define-key lesser-evil-leader-map "fs" 'save-buffer)
+(define-key lesser-evil-leader-map "fS" 'write-file)
+(define-key lesser-evil-leader-map "fy" (make-interactive kill-new (buffer-file-name)))
 
 (define-key lesser-evil-leader-map "hdf" 'describe-function)
 (define-key lesser-evil-leader-map "hdk" 'describe-key)
@@ -270,10 +275,10 @@
 (with-eval-after-load 'image-dired
     (define-key image-dired-display-image-mode-map " " lesser-evil-leader-map)
     (define-key image-dired-thumbnail-mode-map " " lesser-evil-leader-map)
-    (define-key image-dired-thumbnail-mode-map "j" 'image-dired-next-line-and-display)
-    (define-key image-dired-thumbnail-mode-map "k" 'image-dired-previous-line-and-display)
-    (define-key image-dired-thumbnail-mode-map "h" 'image-dired-display-previous-thumbnail-original)
-    (define-key image-dired-thumbnail-mode-map "l" 'image-dired-display-next-thumbnail-original)
+    (define-key image-dired-thumbnail-mode-map "j" 'image-dired-next-line)
+    (define-key image-dired-thumbnail-mode-map "k" 'image-dired-previous-line)
+    (define-key image-dired-thumbnail-mode-map "h" 'image-dired-backward-image)
+    (define-key image-dired-thumbnail-mode-map "l" 'image-dired-forward-image)
     (define-key image-dired-thumbnail-mode-map (kbd "C-f") 'scroll-up)
     (define-key image-dired-thumbnail-mode-map (kbd "C-b") 'scroll-down)
     (define-key image-dired-thumbnail-mode-map "G" 'end-of-buffer)
@@ -345,13 +350,15 @@
 ;; ediff
 (setq ediff-split-window-function 'split-window-horizontally)
 (setq ediff-window-setup-function 'ediff-setup-windows-plain)
-;; It is not that simple :(
-;(defun evilify-ediff-a-bit ()
-;  (define-key ediff-mode-map "gj" 'ediff-jump-to-difference)
-;  (define-key ediff-mode-map "j" 'ediff-next-difference)
-;  (define-key ediff-mode-map "k" 'ediff-previous-difference)
-;  )
-;(add-hook 'ediff-keymap-setup-hook 'evilify-ediff-a-bit)
+(evil-collection-init 'ediff)
+(defun lesser-evil-bind-ediff-meta ()
+  (define-key ediff-meta-buffer-map " " lesser-evil-leader-map)
+  (define-key ediff-meta-buffer-map "j" 'ediff-next-meta-item)
+  (define-key ediff-meta-buffer-map "k" 'ediff-previous-meta-item))
+(add-hook 'ediff-meta-buffer-keymap-setup-hook 'lesser-evil-bind-ediff-meta)
+(push '(nil
+	"<leader>ad" "diff"
+	) lesser-evil-keys-desc)
 
 
 ;; comint
@@ -426,8 +433,11 @@
   "L" 'eww-forward-url
   "gr" 'eww-reload)
 
+
 ;; xref 
 (evil-set-initial-state 'xref--xref-buffer-mode 'motion)
+
+
 ;;======================================================================
 
 ;; 3rd party stuff
@@ -507,7 +517,7 @@
 							  (ivy-thing-at-point)))
 (define-key lesser-evil-leader-map "sg" 'counsel-ag-ask-dir)
 (define-key lesser-evil-leader-map "ss" 'swiper-thing-at-point)
-(define-key lesser-evil-leader-map "so" 'counsel-imenu)
+(define-key lesser-evil-leader-map "sO" 'counsel-imenu)
 (push '(nil
 	"<leader>sb" "current buffer"
 	"<leader>sd" "current directory"

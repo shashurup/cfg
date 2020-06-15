@@ -22,15 +22,18 @@
   (kbd "<localleader> h n") 'cider-browse-ns
   
   (kbd "<localleader> '") 'cider-switch-to-repl-buffer
-  (kbd "<localleader> s B") 'cider-load-buffer
-  (kbd "<localleader> s b") 'cider-load-buffer-and-switch-to-repl-buffer
+  (kbd "<localleader> s b") 'cider-load-buffer
+  (kbd "<localleader> s B") 'cider-load-buffer-and-switch-to-repl-buffer
   (kbd "<localleader> s f") 'cider-insert-defun-in-repl
   (kbd "<localleader> s n") 'cider-insert-ns-form-in-repl
   (kbd "<localleader> s r") 'cider-insert-region-in-repl
   
   (kbd "<localleader> t e") 'cider-enlighten-mode
   (kbd "<localleader> t n") 'cider-toggle-trace-ns
-  (kbd "<localleader> t v") 'cider-toggle-trace-var)
+  (kbd "<localleader> t v") 'cider-toggle-trace-var
+  (kbd "<localleader> t r") 'cider-test-run-test
+  (kbd "<localleader> t p") 'cider-test-run-project-tests
+  (kbd "<localleader> t N") 'cider-test-run-ns-tests)
 
 (evil-set-initial-state 'cider-repl-mode 'insert)
 (evil-define-key 'normal cider-repl-mode-map
@@ -61,8 +64,16 @@
   (kbd "DEL") 'cider-inspector-pop
   "gr" 'cider-inspector-refresh)
 
+(evil-set-initial-state 'cider-test-report-mode 'motion)
+(evil-define-key 'motion 'cider-test-report-mode-map
+  (kbd "TAB") 'cider-test-next-result
+  (kbd "<backtab>") 'cider-test-previous-result
+  (kbd "}") 'cider-test-next-result
+  (kbd "{") 'cider-test-previous-result
+  "gd" 'cider-test-jump
+  "gs" 'cider-test-stacktrace)
+
 ;; TODO cider--debug-mode-map
-;; TODO cider-test-report-mode-map
 ;; TODO cider-macroexpansion-mode-map
 
 (push '(clojure-mode
