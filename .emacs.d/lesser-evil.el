@@ -15,6 +15,7 @@
 (setq evil-want-integration t)
 (setq evil-want-keybinding nil)
 (setq evil-move-beyond-eol t)
+(setq evil-auto-balance-windows t)
 (require 'evil)
 (evil-mode 1)
 (evil-global-set-key 'motion (kbd "SPC") nil)
@@ -89,7 +90,7 @@
 (define-key lesser-evil-leader-map "tn" 'linum-mode)
 
 (define-key lesser-evil-leader-map "w=" 'balance-windows)
-(define-key lesser-evil-leader-map "wd" 'delete-window)
+(define-key lesser-evil-leader-map "wd" 'evil-window-delete)
 (define-key lesser-evil-leader-map "wD" 'kill-buffer-and-window)
 (define-key lesser-evil-leader-map "wF" 'make-frame)
 (define-key lesser-evil-leader-map "wh" 'evil-window-left)
@@ -103,8 +104,8 @@
 (define-key lesser-evil-leader-map "wo" 'delete-other-windows)
 (define-key lesser-evil-leader-map "wO" 'delete-other-windows-vertically)
 (define-key lesser-evil-leader-map "wm" 'maximize-window)
-(define-key lesser-evil-leader-map "ws" 'split-window-vertically)
-(define-key lesser-evil-leader-map "wv" 'split-window-horizontally)
+(define-key lesser-evil-leader-map "ws" 'evil-window-split)
+(define-key lesser-evil-leader-map "wv" 'evil-window-vsplit)
 (define-key lesser-evil-leader-map "ww" 'other-window)
 
 (defhydra window-resize (lesser-evil-leader-map "wr")
@@ -160,7 +161,7 @@
    (clojure . t)
    (restclient . t)
    (shell . t)
-   (emacs-lisp . nil)))
+   (emacs-lisp . t)))
 (setq org-local-leader-map (make-sparse-keymap))
 (evil-define-key 'normal org-mode-map
   "t" 'org-todo
@@ -268,7 +269,9 @@
   (define-key dired-mode-map "I" (make-interactive image-dired "."))
   (define-key dired-mode-map "gr" 'revert-buffer)
   (define-key dired-mode-map "gf" 'dired-goto-file)
-  (define-key dired-mode-map "gG" 'dired-do-chgrp))
+  (define-key dired-mode-map "gG" 'dired-do-chgrp)
+  (define-key dired-mode-map "{" 'dired-prev-subdir)
+  (define-key dired-mode-map "}" 'dired-next-subdir))
 (setq image-dired-thumb-size 256)
 (evil-set-initial-state 'image-dired-thumbnail-mode 'emacs)
 (evil-set-initial-state 'image-dired-display-image-mode 'emacs)
@@ -616,7 +619,7 @@
 
 
 ;; layouts with perspective
-;; Switching layou function cannot be autoloaded
+;; Switching layout function cannot be autoloaded
 ;; and we cannot load perspective lazily
 ;; so we use this hack to at least turn on
 ;; perspective mode with familiar keybinding
