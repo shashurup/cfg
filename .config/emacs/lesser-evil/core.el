@@ -1,4 +1,7 @@
-;; core
+; core
+
+(defun load-from-this-dir (name)
+  (load (concat (file-name-directory load-file-name) name)))
 
 (defmacro make-interactive (fn &rest args)
   `(lambda ()
@@ -439,6 +442,9 @@
 
 ;; xref 
 (evil-set-initial-state 'xref--xref-buffer-mode 'motion)
+(evil-define-key 'motion xref--xref-buffer-mode-map
+  (kbd "TAB") 'xref-goto-xref
+  (kbd "RET") 'xref-quit-and-goto-xref)
 
 
 ;;======================================================================
@@ -464,7 +470,7 @@
 (ivy-rich-mode 1)
 ;; Unmap theese keys to allow global keys to be used for up/down
 (define-key ivy-minibuffer-map (kbd "C-j") nil)
-(define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-dispatching-done)
+(define-key ivy-minibuffer-map (kbd "C-l") 'ivy-dispatching-done)
 (define-key ivy-switch-buffer-map (kbd "C-k") nil)
 (define-key ivy-switch-buffer-map (kbd "C-w") 'ivy-switch-buffer-kill)
 (evil-set-initial-state 'ivy-occur-mode 'emacs)
@@ -527,6 +533,11 @@
 	"<leader>ss" "current buffer"
 	)
       lesser-evil-keys-desc)
+
+;; Single entry point for files and buffers
+;(load (concat user-emacs-directory "ctrlj.el"))
+(load-from-this-dir "ctrlj")
+
 
 ;; projectile
 (define-key lesser-evil-leader-map "p'" 'projectile-run-eshell)
@@ -637,9 +648,18 @@
   (define-key lesser-evil-leader-map "l" nil)
   (define-key lesser-evil-leader-map "ll" 'persp-switch)
   (define-key lesser-evil-leader-map (kbd "l TAB") 'persp-switch-last)
+  (define-key lesser-evil-leader-map
+              "ln"
+              (lambda (persp-name)
+		(interactive "sNew perspective name: ")
+		(let ((buf (current-buffer)))
+		  (persp-switch persp-name)
+		  (persp-set-buffer (buffer-name buf))
+		  (display-buffer buf))))
   (define-key lesser-evil-leader-map "ld" 'persp-kill)
   (define-key lesser-evil-leader-map "la" 'persp-add-buffer)
-  (define-key lesser-evil-leader-map "lr" 'persp-remove-buffer))
+  (define-key lesser-evil-leader-map "lr" (make-interactive persp-remove-buffer
+							    (current-buffer))))
 
 
 ;; smartparens
@@ -679,15 +699,15 @@
 
 
 ;; python
-(load (concat user-emacs-directory "elpy.el"))
+(load-from-this-dir "elpy")
 
 
 ;; clojure
-(load (concat user-emacs-directory "cider.el"))
+(load-from-this-dir "cider")
 
 
 ;; mu4e
-(load (concat user-emacs-directory "mu4e.el"))
+(load-from-this-dir "mu4e")
 
 ;; ctags update
 (setq tags-add-tables nil)

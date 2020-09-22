@@ -40,10 +40,12 @@
   (add-hook 'eww-mode-hook 'set-comfortable-margins))
 
 ;; theme
-(setq doom-henna-brighter-modeline t)
-(load-theme 'doom-henna t)
+;(setq doom-henna-brighter-modeline t)
+(load-theme 'doom-gruvbox t)
 
-(load (concat user-emacs-directory "lesser-evil.el"))
+(load (concat user-emacs-directory "lesser-evil/core"))
+
+(savehist-mode)
 
 (server-start)
 
@@ -63,7 +65,7 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:height 60 :family "Monospace"))))
+ '(default ((t (:height 57 :family "Monospace"))))
  '(fixed-pitch-serif ((t (:height 1.1 :family "Linux Libertine Mono O"))))
  '(variable-pitch ((t (:height 1.1 :family "Sans")))))
 

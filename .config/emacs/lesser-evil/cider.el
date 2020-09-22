@@ -65,7 +65,7 @@
   "gr" 'cider-inspector-refresh)
 
 (evil-set-initial-state 'cider-test-report-mode 'motion)
-(evil-define-key 'motion 'cider-test-report-mode-map
+(evil-define-key 'motion cider-test-report-mode-map
   (kbd "TAB") 'cider-test-next-result
   (kbd "<backtab>") 'cider-test-previous-result
   (kbd "}") 'cider-test-next-result
@@ -83,3 +83,8 @@
 	"<localleader>t" "toggle"
 	)
       lesser-evil-keys-desc)
+
+;move clojure project.el hook to the end so that vc hook triggers first
+(with-eval-after-load 'clojure-mode
+    (remove-hook 'project-find-functions #'clojure-current-project)
+    (add-hook 'project-find-functions #'clojure-current-project t))
