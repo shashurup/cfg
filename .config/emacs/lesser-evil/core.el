@@ -152,11 +152,12 @@
 (evil-collection-init 'calendar)
 
 ;; org
+(setq org-confirm-babel-evaluate nil)
+(define-key lesser-evil-leader-map "c" 'org-capture)
 (add-hook 'org-mode-hook #'org-bullets-mode)
 (add-hook 'org-mode-hook 'evil-org-mode)
 (with-eval-after-load 'evil-org
   (evil-org-set-key-theme '(textobjects)))
-(setq org-confirm-babel-evaluate nil)
 (org-babel-do-load-languages
  'org-babel-load-languages
  '((python . t)
@@ -178,6 +179,7 @@
   (define-key org-local-leader-map "a" 'org-agenda)
   (define-key org-local-leader-map "A" 'org-archive-subtree)
   (define-key org-local-leader-map "d" 'org-deadline)
+  (define-key org-local-leader-map "r" 'org-refile)
   (define-key org-local-leader-map "s" 'org-schedule)
   (define-key org-local-leader-map "n" 'org-narrow-to-subtree)
   (define-key org-local-leader-map "N" 'widen)
@@ -232,7 +234,11 @@
     ("p" lesser-evil-org-paste-src-block-after "paste after")
     ("P" lesser-evil-org-paste-src-block-before "paste before")
     ("s" lesser-evil-org-goto-scratch-src-block  "scratch"))
-  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images))
+  (add-hook 'org-babel-after-execute-hook 'org-redisplay-inline-images)
+  (evil-define-key 'normal org-capture-mode-map
+    (kbd "<localleader>,") 'org-capture-finalize
+    (kbd "<localleader>k") 'org-capture-kill
+    (kbd "<localleader>w") 'org-capture-refile))
 
 (defun my-bind-basic-motion (map)
   (define-key map "j" 'next-line)
@@ -379,13 +385,17 @@
 
 ;; eshell
 (evil-set-initial-state 'eshell-mode 'insert)
-(evil-define-key '(normal insert) eshell-mode-map
-  (kbd "C-j") 'eshell-next-matching-input-from-input
-  (kbd "C-k") 'eshell-previous-matching-input-from-input)
-(evil-define-key 'normal eshell-mode-map
-  (kbd "RET") 'eshell-send-input
-  "[[" 'eshell-previous-prompt
-  "]]" 'eshell-next-prompt)
+;; eshell-mode-map is buffer local for some reason
+;; so we need to set it in the mode hook
+(add-hook 'eshell-mode-hook
+	  (lambda ()
+	    (evil-define-key '(normal insert) eshell-mode-map
+	      (kbd "C-j") 'eshell-next-matching-input-from-input
+	      (kbd "C-k") 'eshell-previous-matching-input-from-input)
+	    (evil-define-key 'normal eshell-mode-map
+	      (kbd "RET") 'eshell-send-input
+	      "[[" 'eshell-previous-prompt
+	      "]]" 'eshell-next-prompt)))
 
 
 ;; sql
@@ -556,7 +566,7 @@
 (define-key lesser-evil-leader-map "sp" 'counsel-projectile-ag)
 
 
-;; winum
+; winum
 (defun lesser-evil-find-window (w1 w2 num)
   (when w2
     (if (eq w1 w2)
@@ -571,7 +581,8 @@
 
 (defun lesser-evil-display-buffer-in (num)
   (set-window-buffer (winum-get-window-by-number num)
-		     (current-buffer)))
+                     (current-buffer))
+  (switch-to-prev-buffer))
 
 (define-key lesser-evil-leader-map "0" 'winum-select-window-0)
 (define-key lesser-evil-leader-map "1" 'winum-select-window-1)
@@ -594,7 +605,9 @@
 (define-key lesser-evil-leader-map "b9" (make-interactive lesser-evil-display-buffer-in 9))
 (with-eval-after-load 'winum
   (winum-mode)
-  (add-to-list 'winum-assign-functions #'lesser-evil-window-num))
+  ; TODO enable this again after fixing problems with multiple frames
+  ; (add-to-list 'winum-assign-functions #'lesser-evil-window-num)
+  )
 
 
 ;; smooth scrolling
@@ -720,14 +733,24 @@
 (add-hook 'java-mode-hook 'lesser-evil-enable-ctags)
 (add-hook 'ruby-mode-hook 'lesser-evil-enable-ctags)
 
+;; plantuml
+(setq plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar")
+(setq plantuml-default-exec-mode 'jar)
+(evil-define-key 'normal plantuml-mode-map
+  (kbd "<localleader> ,") 'plantuml-preview)
+
 ;; apply keybindings descriptions to which-key
 (dolist (kd lesser-evil-keys-desc)
   (if (car kd)
       (apply 'which-key-add-major-mode-key-based-replacements kd)
       (apply 'which-key-add-key-based-replacements (cdr kd))))
 
+;; kbdd
+(load-from-this-dir "kbdd")
+
 
 ;; xref window bindings
 ;; TODO sql repl establish connection by postgre connection string
 ;; TODO pdf mode (check out pdf tools)
 ;; TODO ediff keybindings and floating window
+;; TODO sudo support

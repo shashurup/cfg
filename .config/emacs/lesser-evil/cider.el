@@ -83,8 +83,3 @@
 	"<localleader>t" "toggle"
 	)
       lesser-evil-keys-desc)
-
-;move clojure project.el hook to the end so that vc hook triggers first
-(with-eval-after-load 'clojure-mode
-    (remove-hook 'project-find-functions #'clojure-current-project)
-    (add-hook 'project-find-functions #'clojure-current-project t))

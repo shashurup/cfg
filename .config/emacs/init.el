@@ -16,6 +16,7 @@
 (scroll-bar-mode -1)
 (setq visible-bell 1)
 (column-number-mode)
+(setq-default indent-tabs-mode nil)
 
 ;; Package initialization
 (require 'package)
@@ -39,6 +40,31 @@
 (with-eval-after-load 'eww
   (add-hook 'eww-mode-hook 'set-comfortable-margins))
 
+;; org
+(setq org-directory "~/org")
+(setq org-default-notes-file (concat org-directory "/notes.org"))
+(setq org-agenda-files (list (concat org-directory "/my.org")
+                             (concat org-directory "/projects")))
+(setq org-refile-targets '((org-agenda-files . (:level . 1))))
+(setq org-capture-templates
+      '(("t" "Todo" entry (file "")
+         "* TODO %?\n  %i\n  %a")
+        ("c" "Note" entry (file "")
+         "* %?\n  %i\n  %a")
+        ("e" "External note (from clipboard)" entry (file "")
+         "* %?\n  %x")
+        ))
+(defun lesser-evil-org-capture-external-note ()
+  (interactive)
+  (let ((org-capture-p (lambda (w)
+                         (string-prefix-p "CAPTURE-"
+                                          (buffer-name (window-buffer w))))))
+    (org-capture nil "e")
+    (let ((capture-win (seq-find org-capture-p (window-list))))
+      (delete-other-windows capture-win)
+      (add-hook 'kill-buffer-hook 'delete-frame 0 t))
+    ))
+
 ;; theme
 ;(setq doom-henna-brighter-modeline t)
 (load-theme 'doom-gruvbox t)
@@ -56,8 +82,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   (quote
-    (ivy-xref ctags-update ggtags markdown-mode ivy-hydra evil-org evil-text-object-python ob-restclient restclient hydra cider smartparens perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit)))
+   '(docker-tramp plantuml-mode base16-theme htmlize lua-mode ivy-xref ctags-update ggtags markdown-mode ivy-hydra evil-org evil-text-object-python ob-restclient restclient hydra cider smartparens perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit))
  '(tool-bar-mode nil))
 
 (custom-set-faces
