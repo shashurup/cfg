@@ -67,7 +67,8 @@
 
 ;; theme
 ;(setq doom-henna-brighter-modeline t)
-(load-theme 'doom-gruvbox t)
+(setq doom-peacock-brighter-modeline t)
+(load-theme 'doom-peacock t)
 
 (load (concat user-emacs-directory "lesser-evil/core"))
 

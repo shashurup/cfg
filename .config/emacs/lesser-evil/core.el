@@ -8,8 +8,6 @@
      (interactive)
      ,(cons fn args)))
 
-;; Input method toggling by caps mapped to F19
-(global-set-key (kbd "<f19>") 'toggle-input-method)
 ;; Unmap "SPC" so that it can be used by evil motion map
 (define-key special-mode-map (kbd "SPC") nil)
 (define-key Info-mode-map (kbd "SPC") nil)
@@ -153,6 +151,7 @@
 
 ;; org
 (setq org-confirm-babel-evaluate nil)
+(define-key lesser-evil-leader-map "A" 'org-agenda)
 (define-key lesser-evil-leader-map "c" 'org-capture)
 (add-hook 'org-mode-hook #'org-bullets-mode)
 (add-hook 'org-mode-hook 'evil-org-mode)
@@ -172,12 +171,15 @@
   "<" 'org-metaleft
   ">" 'org-metaright
   (kbd "<localleader>") org-local-leader-map)
+(evil-define-key 'emacs org-agenda-keymap
+  "j" 'org-agenda-next-line
+  "k" 'org-agenda-previous-line)
 (with-eval-after-load 'org
   (define-key org-local-leader-map "," 'org-ctrl-c-ctrl-c)
   (define-key org-local-leader-map "/" 'org-sparse-tree)
   (define-key org-local-leader-map "." 'org-time-stamp)
-  (define-key org-local-leader-map "a" 'org-agenda)
-  (define-key org-local-leader-map "A" 'org-archive-subtree)
+  (define-key org-local-leader-map "a" 'org-archive-subtree)
+  (define-key org-local-leader-map "A" 'org-agenda)
   (define-key org-local-leader-map "d" 'org-deadline)
   (define-key org-local-leader-map "r" 'org-refile)
   (define-key org-local-leader-map "s" 'org-schedule)
@@ -481,6 +483,10 @@
 ;; Unmap theese keys to allow global keys to be used for up/down
 (define-key ivy-minibuffer-map (kbd "C-j") nil)
 (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-dispatching-done)
+(define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-immediate-done)
+(define-key ivy-minibuffer-map (kbd "C-RET") 'ivy-immediate-done)
+(define-key ivy-minibuffer-map (kbd "S-<return>") 'ivy-alt-done)
+(define-key ivy-minibuffer-map (kbd "S-RET") 'ivy-alt-done)
 (define-key ivy-switch-buffer-map (kbd "C-k") nil)
 (define-key ivy-switch-buffer-map (kbd "C-w") 'ivy-switch-buffer-kill)
 (evil-set-initial-state 'ivy-occur-mode 'emacs)
