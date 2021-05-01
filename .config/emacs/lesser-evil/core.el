@@ -483,6 +483,7 @@
 ;; Unmap theese keys to allow global keys to be used for up/down
 (define-key ivy-minibuffer-map (kbd "C-j") nil)
 (define-key ivy-minibuffer-map (kbd "C-l") 'ivy-dispatching-done)
+(define-key counsel-ag-map (kbd "C-l") 'ivy-dispatching-done)
 (define-key ivy-minibuffer-map (kbd "C-<return>") 'ivy-immediate-done)
 (define-key ivy-minibuffer-map (kbd "C-RET") 'ivy-immediate-done)
 (define-key ivy-minibuffer-map (kbd "S-<return>") 'ivy-alt-done)
@@ -497,11 +498,19 @@
 (define-key ivy-occur-mode-map "g" nil)
 (define-key ivy-occur-mode-map "gg" 'beginning-of-buffer)
 
-(defun counsel-ag-ask-dir ()
+(defun counsel-ag-current-dir ()
   (interactive)
-  (counsel-ag
-   (ivy-thing-at-point)
-   (counsel-read-directory-name "ag in directory:")))
+  (counsel-ag (ivy-thing-at-point)))
+
+(defun counsel-ag-dir (dir pattern)
+  (interactive
+   (let ((dir (counsel-read-directory-name "ag in directory: "))
+         (pattern (read-string "files matching regex (.*): "
+                               "" 'counsel-file-pattern ".*")))
+     (list dir pattern)))
+  (counsel-ag (ivy-thing-at-point)
+              dir
+              (concat "--file-search-regex " pattern)))
 
 (with-eval-after-load 'counsel
   ;; this is just a modified copy of counsel function
@@ -538,9 +547,9 @@
 (define-key lesser-evil-leader-map "hdv" 'counsel-describe-variable)
 (define-key lesser-evil-leader-map "hdk" 'counsel-descbinds)
 (define-key lesser-evil-leader-map "sb" 'swiper-thing-at-point)
-(define-key lesser-evil-leader-map "sd" (make-interactive counsel-ag
-							  (ivy-thing-at-point)))
-(define-key lesser-evil-leader-map "sg" 'counsel-ag-ask-dir)
+(define-key lesser-evil-leader-map "sd" 'counsel-ag-current-dir)
+(define-key lesser-evil-leader-map "/" 'counsel-ag-current-dir) ;; to be overriden later
+(define-key lesser-evil-leader-map "sg" 'counsel-ag-dir)
 (define-key lesser-evil-leader-map "ss" 'swiper-thing-at-point)
 (define-key lesser-evil-leader-map "sO" 'counsel-imenu)
 (push '(nil
@@ -564,8 +573,15 @@
 
 
 ;; counsel-projectile
+
+(defun counsel-project-or-dir ()
+  (interactive)
+  (if (projectile-project-p)
+      (counsel-projectile-ag)
+    (counsel-ag-current-dir)))
+
 (setq counsel-projectile-ag-initial-input '(ivy-thing-at-point))
-(define-key lesser-evil-leader-map "/" 'counsel-projectile-ag)
+(define-key lesser-evil-leader-map "/" 'counsel-project-or-dir)
 (define-key lesser-evil-leader-map "pf" 'counsel-projectile-find-file)
 (define-key lesser-evil-leader-map "pp" 'counsel-projectile-switch-project)
 (define-key lesser-evil-leader-map "ps" 'counsel-projectile-ag)
