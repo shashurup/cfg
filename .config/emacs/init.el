@@ -83,7 +83,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(docker-tramp plantuml-mode base16-theme htmlize lua-mode ivy-xref ctags-update ggtags markdown-mode ivy-hydra evil-org evil-text-object-python ob-restclient restclient hydra cider smartparens perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company pyenv-mode-auto elpy ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit))
+   '(pyenv-mode elpy docker-tramp plantuml-mode base16-theme htmlize lua-mode ivy-xref ctags-update ggtags markdown-mode ivy-hydra evil-org evil-text-object-python ob-restclient restclient hydra cider smartparens perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit))
  '(tool-bar-mode nil))
 
 (custom-set-faces

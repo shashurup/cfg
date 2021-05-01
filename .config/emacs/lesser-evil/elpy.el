@@ -1,9 +1,11 @@
 
-;; TODO pyenv shim path for child processes
+;; pyenv shim path for child processes
 (setenv "PATH" (concat (expand-file-name "~/.pyenv/shims") ":" (getenv "PATH")))
 (setq python-shell-interpreter "ipython"
-      python-shell-interpreter-args "-i --simple-prompt"
-      exec-path (add-to-list 'exec-path (expand-file-name "~/.pyenv/shims")))
+      python-shell-interpreter-args "-i --simple-prompt")
+
+;; elpy needs pip for startup which is not available in the default system python
+(add-to-list 'exec-path (expand-file-name "~/.pyenv/shims"))
 
 (evil-define-key 'normal 'elpy-mode
   (kbd "<localleader> c") 'elpy-config
@@ -32,7 +34,17 @@
 (with-eval-after-load 'elpy
   (elpy-enable))
 
+(defun lesser-evil-current-pyenv-version ()
+  (car (process-lines "pyenv" "version-name")))
+
+(defun lesser-evil-elpy-activate-venv ()
+  (when-let ((venv (lesser-evil-current-pyenv-version)))
+    (pyvenv-activate (pyenv-mode-full-path venv))
+    ;; buffer-local var for venv tracking
+    (setq-local pyvenv-activate pyvenv-virtual-env)))
+
 (with-eval-after-load 'python
-  (pyenv-mode)
-  (require 'pyenv-mode-auto)
-  (add-hook 'python-mode-hook 'elpy-enable))
+  (require 'pyenv-mode) ;; we just need a function from it
+  (pyvenv-tracking-mode)
+  (add-hook 'python-mode-hook 'elpy-enable)
+  (add-hook 'python-mode-hook 'lesser-evil-elpy-activate-venv))
