@@ -116,6 +116,42 @@
   ("h" shrink-window-horizontally "shrink window horizontally")
   ("l" enlarge-window-horizontally "enlarge window horizontally"))
 
+(defun lesser-evil-text-scale-reset ()
+  (interactive)
+  (text-scale-set 0))
+
+(defhydra buffer-font-size (lesser-evil-leader-map "bf")
+  "Buffer font"
+  ("-" text-scale-decrease "Decrease font size")
+  ("=" text-scale-increase "Increase font size")
+  ("0" lesser-evil-text-scale-reset "Reset font size"))
+
+(setq lesser-evil-default-font-size (face-attribute 'default :height))
+
+(defun lesser-evil-global-text-scale-reset ()
+  (interactive)
+  (set-face-attribute 'default
+                      (selected-frame)
+                      :height lesser-evil-default-font-size))
+
+(defun lesser-evil-global-text-scale-increase ()
+  (interactive)
+  (set-face-attribute 'default
+                      (selected-frame)
+                      :height (+ (face-attribute 'default :height) 5)))
+
+(defun lesser-evil-global-text-scale-decrease ()
+  (interactive)
+  (set-face-attribute 'default
+                      (selected-frame)
+                      :height (- (face-attribute 'default :height) 5)))
+
+(defhydra frame-font-size (lesser-evil-leader-map "wf")
+  "Frame font"
+  ("-" lesser-evil-global-text-scale-decrease "Decrease font size")
+  ("=" lesser-evil-global-text-scale-increase "Increase font size")
+  ("0" lesser-evil-global-text-scale-reset "Reset font size"))
+
 (evil-define-key 'motion 'global (kbd "<leader>") lesser-evil-leader-map)
 
 (setq lesser-evil-keys-desc nil)
@@ -123,6 +159,7 @@
 	"<leader>a" "applications"
 	"<leader>b" "buffer"
 	"<leader>bs" "scratch"
+	"<leader>bf" "font size"
 	"<leader>f" "file"
 	"<leader>g" "git"
 	"<leader>h" "help"
@@ -134,6 +171,7 @@
 	"<leader>s" "search"
 	"<leader>t" "toggle"
 	"<leader>w" "window"
+	"<leader>wf" "font size"
 	"<leader>wr" "resize"
 	) lesser-evil-keys-desc)
 
@@ -151,6 +189,9 @@
 
 ;; org
 (setq org-confirm-babel-evaluate nil)
+;; turn off auto-identation in src code blocks
+;; while this sounds like a good feature it is actually broken
+(setq org-src-tab-acts-natively nil)
 (define-key lesser-evil-leader-map "A" 'org-agenda)
 (define-key lesser-evil-leader-map "c" 'org-capture)
 (add-hook 'org-mode-hook #'org-bullets-mode)
@@ -170,6 +211,7 @@
   "t" 'org-todo
   "<" 'org-metaleft
   ">" 'org-metaright
+  (kbd "<return>") 'org-open-at-point
   (kbd "<localleader>") org-local-leader-map)
 (evil-define-key 'emacs org-agenda-keymap
   "j" 'org-agenda-next-line
@@ -193,6 +235,8 @@
   (define-key org-local-leader-map "ts" 'org-table-insert-hline)
   (define-key org-local-leader-map "t?" 'org-table-field-info)
   (define-key org-local-leader-map "t," 'org-table-recalculate)
+  (define-key org-local-leader-map "e"  'org-babel-execute-subtree)
+  ;; Hydra for source code
   (defun lesser-evil-org-delete-src-block ()
     (interactive)
     (let ((pos (org-babel-where-is-src-block-head)))
@@ -401,6 +445,8 @@
 
 
 ;; sql
+;; Do not filter SQL buffers by 'ansi dialect
+(setq sql-product nil)
 (evil-set-initial-state 'sql-interactive-mode 'insert)
 (evil-define-key 'normal sql-interactive-mode-map
   (kbd "RET") 'comint-send-input
@@ -453,8 +499,11 @@
 
 
 ;; xref 
+(setq xref-prompt-for-identifier nil)
 (evil-set-initial-state 'xref--xref-buffer-mode 'motion)
 (evil-define-key 'motion xref--xref-buffer-mode-map
+  "j" 'xref-next-line
+  "k" 'xref-prev-line
   (kbd "TAB") 'xref-goto-xref
   (kbd "RET") 'xref-quit-and-goto-xref)
 
@@ -563,29 +612,7 @@
 ;(load (concat user-emacs-directory "ctrlj.el"))
 (load-from-this-dir "ctrlj")
 
-
-;; projectile
-(define-key lesser-evil-leader-map "p'" 'projectile-run-eshell)
-(define-key lesser-evil-leader-map "p!" 'projectile-run-shell-command-in-root)
-(define-key lesser-evil-leader-map "pd" 'projectile-dired)
-(with-eval-after-load 'projectile
-  (projectile-mode +1))
-
-
-;; counsel-projectile
-
-(defun counsel-project-or-dir ()
-  (interactive)
-  (if (projectile-project-p)
-      (counsel-projectile-ag)
-    (counsel-ag-current-dir)))
-
-(setq counsel-projectile-ag-initial-input '(ivy-thing-at-point))
-(define-key lesser-evil-leader-map "/" 'counsel-project-or-dir)
-(define-key lesser-evil-leader-map "pf" 'counsel-projectile-find-file)
-(define-key lesser-evil-leader-map "pp" 'counsel-projectile-switch-project)
-(define-key lesser-evil-leader-map "ps" 'counsel-projectile-ag)
-(define-key lesser-evil-leader-map "sp" 'counsel-projectile-ag)
+(load-from-this-dir "proj")
 
 
 ; winum
@@ -663,7 +690,6 @@
 (define-key company-active-map (kbd "C-j") 'company-select-next)
 (define-key company-active-map (kbd "C-k") 'company-select-previous)
 
-
 ;; layouts with perspective
 ;; Switching layout function cannot be autoloaded
 ;; and we cannot load perspective lazily
@@ -694,7 +720,7 @@
   (define-key lesser-evil-leader-map "ld" 'persp-kill)
   (define-key lesser-evil-leader-map "la" 'persp-add-buffer)
   (define-key lesser-evil-leader-map "lr" (make-interactive persp-remove-buffer
-							    (current-buffer))))
+                                                            (current-buffer))))
 
 
 ;; smartparens
@@ -734,7 +760,7 @@
 
 
 ;; python
-(load-from-this-dir "elpy")
+;(load-from-this-dir "elpy")
 
 
 ;; clojure
@@ -752,8 +778,6 @@
     (visit-tags-table tf t)))
 
 (add-hook 'sql-mode-hook 'lesser-evil-enable-ctags)
-(add-hook 'java-mode-hook 'lesser-evil-enable-ctags)
-(add-hook 'ruby-mode-hook 'lesser-evil-enable-ctags)
 
 ;; plantuml
 (setq plantuml-jar-path "/usr/share/java/plantuml/plantuml.jar")
@@ -770,6 +794,37 @@
 ;; kbdd
 (load-from-this-dir "kbdd")
 
+;; EAF
+; (defun lesser-evil-init-eaf ()
+;   (interactive)
+;   (add-to-list 'load-path "~/.config/emacs/site-lisp/emacs-application-framework")
+;   (require 'eaf)
+;   (eaf-setq eaf-browser-default-zoom "1.4")
+;   (setq eaf-evil-leader-key "SPC")
+;   (setq eaf-evil-leader-keymap lesser-evil-leader-map)
+;   (require 'eaf-evil)
+;   (setq browse-url-browser-function 'eaf-open-browser)
+;   (setq eaf-browser-default-search-engine "duckduckgo")
+;   )
+
+;; LSP
+(require 'lsp-mode)
+(setq lsp-auto-guess-root t)
+(add-hook 'java-mode-hook 'lsp)
+(add-hook 'python-mode-hook 'lsp)
+(add-hook 'ruby-mode-hook 'lsp)
+
+(push (lambda (s p)
+        (when (lsp-feature? "textDocument/definition")
+          (lsp-find-definition)
+          t))
+      evil-goto-definition-functions)
+
+;; (define-key lesser-evil-leader-map "so"
+;;   (lambda ()
+;;     (if (lsp-feature? "textDocument/references")
+;;         (lsp-find-references)
+;;       (xref-find-references))))
 
 ;; xref window bindings
 ;; TODO sql repl establish connection by postgre connection string

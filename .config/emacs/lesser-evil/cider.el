@@ -9,10 +9,8 @@
   (kbd "<localleader> e e") 'cider-eval-sexp-at-point
   (kbd "<localleader> e i") 'cider-inspector
 
-  "gd" 'cider-find-dwim
-  "gD" 'cider-find-dwim-other-window
-  (kbd "<localleader> g d") 'cider-find-dwim
-  (kbd "<localleader> g D") 'cider-find-dwim-other-window
+  "gd" 'cider-find-var
+  (kbd "<localleader> g d") 'cider-find-var
   (kbd "<localleader> g n") 'cider-find-ns
   
   (kbd "<localleader> h a") 'cider-apropos
@@ -21,6 +19,12 @@
   (kbd "<localleader> h j") 'cider-javadoc
   (kbd "<localleader> h n") 'cider-browse-ns
   
+  (kbd "<localleader> p c") 'cider-profile-clear
+  (kbd "<localleader> p n") 'cider-profile-ns-toggle
+  (kbd "<localleader> p s") 'cider-profile-summary
+  (kbd "<localleader> p t") 'cider-profile-toggle
+  (kbd "<localleader> p v") 'cider-profile-var-summary
+
   (kbd "<localleader> '") 'cider-switch-to-repl-buffer
   (kbd "<localleader> s b") 'cider-load-buffer
   (kbd "<localleader> s B") 'cider-load-buffer-and-switch-to-repl-buffer
@@ -79,6 +83,8 @@
 (push '(clojure-mode
 	"<localleader>e" "eval"
 	"<localleader>h" "help"
+	"<localleader>g" "goto"
+	"<localleader>p" "profile"
 	"<localleader>s" "repl"
 	"<localleader>t" "toggle"
 	)

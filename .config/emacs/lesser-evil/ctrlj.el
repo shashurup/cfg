@@ -49,8 +49,7 @@
 		 '(("d" counsel-find-file-mkdir-action "mkdir")
                    ("l" find-file-literally "open literally")
                    ("r" counsel-find-file-as-root "open as root")
-                   ("f" (lambda (x) (counsel-find-file)) "switch dir")
-		   ("p" (lambda (x) (counsel-projectile-switch-project)) "switch project")))
+                   ("f" (lambda (x) (counsel-find-file)) "switch dir")))
 
 (defun lesser-evil-cur-dir ()
   (plist-get (ivy-state-extra-props ivy-last)

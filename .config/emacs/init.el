@@ -17,6 +17,7 @@
 (setq visible-bell 1)
 (column-number-mode)
 (setq-default indent-tabs-mode nil)
+(setq-default tab-width 4)
 
 ;; Package initialization
 (require 'package)
@@ -66,9 +67,11 @@
     ))
 
 ;; theme
-;(setq doom-henna-brighter-modeline t)
-(setq doom-peacock-brighter-modeline t)
-(load-theme 'doom-peacock t)
+; (setq doom-henna-brighter-modeline t)
+; (load-theme 'doom-henna t)
+;(load-theme 'doom-peacock t)
+;(setq doom-peacock-brighter-modeline t)
+(load-theme 'base16-gruvbox-dark-soft t)
 
 (load (concat user-emacs-directory "lesser-evil/core"))
 
@@ -83,7 +86,7 @@
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
  '(package-selected-packages
-   '(pyenv-mode elpy docker-tramp plantuml-mode base16-theme htmlize lua-mode ivy-xref ctags-update ggtags markdown-mode ivy-hydra evil-org evil-text-object-python ob-restclient restclient hydra cider smartparens perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company ag org-bullets winum which-key ivy-rich counsel-projectile projectile evil-collection ivy evil magit evil-magit))
+   '(hsluv counsel f lsp-docker lsp-ivy lsp-java lsp-mode lsp-ui avy yaml-mode epc deferred ctable pyenv-mode elpy docker-tramp plantuml-mode base16-theme htmlize lua-mode ivy-xref ctags-update ggtags markdown-mode ivy-hydra evil-org evil-text-object-python ob-restclient restclient hydra cider smartparens perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company ag org-bullets winum which-key ivy-rich evil-collection ivy evil magit evil-magit))
  '(tool-bar-mode nil))
 
 (custom-set-faces
@@ -91,9 +94,9 @@
  ;; If you edit it by hand, you could mess it up, so be careful.
  ;; Your init file should contain only one such instance.
  ;; If there is more than one, they won't work right.
- '(default ((t (:height 57 :family "Monospace"))))
+ '(default ((t (:height 60 :family "DejaVu Sans Mono"))))
  '(fixed-pitch-serif ((t (:height 1.1 :family "Linux Libertine Mono O"))))
- '(variable-pitch ((t (:height 1.1 :family "Sans")))))
+ '(variable-pitch ((t (:height 1.1 :family "DejaVu Sans")))))
 
 
 ;; Themes to consider:
@@ -127,3 +130,4 @@
 ;;   deeper-blue (разноцветненько, встроенная)
 ;;   misterioso, tango-dark (тепло, разноцветно, но цвета коментов и строк непрактичные)
 
+(put 'dired-find-alternate-file 'disabled nil)

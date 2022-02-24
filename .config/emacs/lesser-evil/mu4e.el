@@ -36,7 +36,6 @@
 
 (setq send-mail-function 'smtpmail-send-it
       auth-sources '(default)
-      ; mu4e-view-use-gnus t
       mu4e-confirm-quit nil
       mu4e-view-show-images t
       mu4e-view-show-addresses t
@@ -81,6 +80,8 @@
   (evil-define-key 'normal mu4e-compose-mode-map (kbd "<localleader> ,") 'message-send-and-exit)
   (evil-define-key 'normal mu4e-compose-mode-map (kbd "<localleader> s") 'message-send)
   (evil-define-key 'normal mu4e-compose-mode-map (kbd "<localleader> a") 'mml-attach-file)
+  ;; Enter to open links in text mode
+  ; (define-key mu4e-view-clickable-urls-keymap (kbd "<return>") 'mu4e~view-browse-url-from-binding)
 
   (setq mu4e-contexts (my-mu4e-context))
 
