@@ -1,2 +1,5 @@
-Xft.hintstyle: hintslight
-Xcursor.theme: Chameleon-DarkSkyBlue-Regular
+Xft.dpi:        243
+Xft.antialias:  1
+Xft.hinting:    1
+Xft.hintstyle:  hintslight
+Xft.rgba:       rgb

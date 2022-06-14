@@ -695,6 +695,7 @@
 ;; and we cannot load perspective lazily
 ;; so we use this hack to at least turn on
 ;; perspective mode with familiar keybinding
+(setq persp-suppress-no-prefix-key-warning t)
 (define-key lesser-evil-leader-map "l" 'persp-mode)
 (with-eval-after-load 'perspective
 
@@ -795,17 +796,17 @@
 (load-from-this-dir "kbdd")
 
 ;; EAF
-; (defun lesser-evil-init-eaf ()
-;   (interactive)
-;   (add-to-list 'load-path "~/.config/emacs/site-lisp/emacs-application-framework")
-;   (require 'eaf)
-;   (eaf-setq eaf-browser-default-zoom "1.4")
-;   (setq eaf-evil-leader-key "SPC")
-;   (setq eaf-evil-leader-keymap lesser-evil-leader-map)
-;   (require 'eaf-evil)
-;   (setq browse-url-browser-function 'eaf-open-browser)
-;   (setq eaf-browser-default-search-engine "duckduckgo")
-;   )
+;; (defun lesser-evil-init-eaf ()
+;;   (interactive)
+;;   (add-to-list 'load-path "~/.config/emacs/site-lisp/emacs-application-framework")
+;;   (require 'eaf)
+;;   (eaf-setq eaf-browser-default-zoom "1.4")
+;;   (setq eaf-evil-leader-key "SPC")
+;;   (setq eaf-evil-leader-keymap lesser-evil-leader-map)
+;;   (require 'eaf-evil)
+;;   (setq browse-url-browser-function 'eaf-open-browser)
+;;   (setq eaf-browser-default-search-engine "duckduckgo")
+;;   )
 
 ;; LSP
 (require 'lsp-mode)

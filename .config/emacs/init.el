@@ -66,11 +66,14 @@
       (add-hook 'kill-buffer-hook 'delete-frame 0 t))
     ))
 
+(help-at-pt-set-timer)
+
 ;; theme
 ; (setq doom-henna-brighter-modeline t)
 ; (load-theme 'doom-henna t)
 ;(load-theme 'doom-peacock t)
 ;(setq doom-peacock-brighter-modeline t)
+
 (load-theme 'base16-gruvbox-dark-soft t)
 
 (load (concat user-emacs-directory "lesser-evil/core"))
