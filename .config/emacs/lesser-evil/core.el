@@ -682,7 +682,7 @@
   " " lesser-evil-leader-map)
 (evil-initial-state 'magit-diff-mode 'motion)
 (with-eval-after-load 'magit
-  (require 'evil-magit))
+  (evil-collection-init 'magit))
 
 
 ;; company
