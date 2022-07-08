@@ -1,3 +1,4 @@
+(require 'dbus)
 
 (setq lesser-evil-kbdd-current-layout 0)
 
