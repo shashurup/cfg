@@ -8,125 +8,11 @@
      (interactive)
      ,(cons fn args)))
 
-;; Unmap "SPC" so that it can be used by evil motion map
-(define-key special-mode-map (kbd "SPC") nil)
-(define-key Info-mode-map (kbd "SPC") nil)
-(setq-default evil-symbol-word-search t)
-(setq evil-flash-delay 8)
-(setq evil-want-integration t)
-(setq evil-want-keybinding nil)
-(setq evil-move-beyond-eol t)
-(setq evil-auto-balance-windows t)
-(require 'evil)
-(evil-mode 1)
-(evil-global-set-key 'motion (kbd "SPC") nil)
-(evil-set-leader 'motion (kbd "SPC"))
-(evil-set-leader 'motion (kbd ",") t)
-;(define-key evil-outer-text-objects-map "w" 'evil-a-symbol)
-;(define-key evil-inner-text-objects-map "w" 'evil-inner-symbol)
-
-(setq lesser-evil-leader-map (make-sparse-keymap))
-
-; Basic keybinding are inspired by spacemacs
-(define-key lesser-evil-leader-map " " 'execute-extended-command)
-(define-key lesser-evil-leader-map (kbd "TAB") 'evil-switch-to-windows-last-buffer)
-(define-key lesser-evil-leader-map ":" 'eval-expression)
-(define-key lesser-evil-leader-map "'" 'eshell)
-(define-key lesser-evil-leader-map "!" 'shell-command)
-(define-key lesser-evil-leader-map "u" 'universal-argument)
-
-(define-key lesser-evil-leader-map "aC" 'calendar)
-(define-key lesser-evil-leader-map "ac" 'calc-dispatch)
-(define-key lesser-evil-leader-map "adb" 'ediff-buffers)
-(define-key lesser-evil-leader-map "add" 'ediff-directories)
-(define-key lesser-evil-leader-map "adf" 'ediff-files)
-(define-key lesser-evil-leader-map "ap" 'list-processes)
-(define-key lesser-evil-leader-map "aP" 'proced)
-
-(define-key lesser-evil-leader-map "bb" 'switch-to-buffer)
-(define-key lesser-evil-leader-map "bd" 'kill-current-buffer)
-(define-key lesser-evil-leader-map "bD" 'kill-buffer-and-window)
-(define-key lesser-evil-leader-map "bk" 'kill-current-buffer)
-(define-key lesser-evil-leader-map "bn" 'next-buffer)
-(define-key lesser-evil-leader-map "bp" 'previous-buffer)
-(define-key lesser-evil-leader-map "br" 'revert-buffer)
-(define-key lesser-evil-leader-map "bs" (make-interactive switch-to-buffer "*scratch*"))
-
-(define-key lesser-evil-leader-map "ff" 'find-file)
-(define-key lesser-evil-leader-map "fr" 'recentf-open-files)
-(define-key lesser-evil-leader-map "fs" 'save-buffer)
-(define-key lesser-evil-leader-map "fS" 'write-file)
-(define-key lesser-evil-leader-map "fy" (make-interactive kill-new (buffer-file-name)))
-
-(define-key lesser-evil-leader-map "hdf" 'describe-function)
-(define-key lesser-evil-leader-map "hdk" 'describe-key)
-(define-key lesser-evil-leader-map "hdf" 'describe-face)
-(define-key lesser-evil-leader-map "hdm" 'describe-mode)
-(define-key lesser-evil-leader-map "hdv" 'describe-variable)
-(define-key lesser-evil-leader-map "hdp" 'describe-package)
-(define-key lesser-evil-leader-map "ha" 'apropos)
-(define-key lesser-evil-leader-map "hi" 'info)
-(define-key lesser-evil-leader-map "hm" 'man)
-(define-key lesser-evil-leader-map "hr" 'info-emacs-manual)
-
-(put 'narrow-to-region 'disabled nil)
-(define-key lesser-evil-leader-map "nd" 'narrow-to-defun)
-(define-key lesser-evil-leader-map "nr" 'narrow-to-region)
-(define-key lesser-evil-leader-map "nw" 'widen)
-
-(define-key lesser-evil-leader-map "qq" 'save-buffers-kill-terminal)
-(define-key lesser-evil-leader-map "qQ" 'kill-emacs)
-(define-key lesser-evil-leader-map "qz" 'delete-frame)
-
-(define-key lesser-evil-leader-map "sb" 'occur)
-(define-key lesser-evil-leader-map "sd" 'find-dired)
-(define-key lesser-evil-leader-map "sg" 'find-grep)
-(define-key lesser-evil-leader-map "ss" 'occur)
-(define-key lesser-evil-leader-map "so" 'xref-find-definitions)
-(define-key lesser-evil-leader-map "sO" 'imenu)
-(define-key lesser-evil-leader-map "sr" 'xref-find-references)
-
-(define-key lesser-evil-leader-map "tf" 'auto-fill-mode)
-(define-key lesser-evil-leader-map "tl" 'toggle-truncate-lines)
-(define-key lesser-evil-leader-map "tn" 'linum-mode)
-
-(define-key lesser-evil-leader-map "w=" 'balance-windows)
-(define-key lesser-evil-leader-map "wd" 'evil-window-delete)
-(define-key lesser-evil-leader-map "wD" 'kill-buffer-and-window)
-(define-key lesser-evil-leader-map "wF" 'make-frame)
-(define-key lesser-evil-leader-map "wh" 'evil-window-left)
-(define-key lesser-evil-leader-map "wj" 'evil-window-down)
-(define-key lesser-evil-leader-map "wk" 'evil-window-up)
-(define-key lesser-evil-leader-map "wl" 'evil-window-right)
-(define-key lesser-evil-leader-map "wH" 'evil-window-move-far-left)
-(define-key lesser-evil-leader-map "wJ" 'evil-window-move-very-bottom)
-(define-key lesser-evil-leader-map "wK" 'evil-window-move-very-top)
-(define-key lesser-evil-leader-map "wL" 'evil-window-move-far-right)
-(define-key lesser-evil-leader-map "wo" 'delete-other-windows)
-(define-key lesser-evil-leader-map "wO" 'delete-other-windows-vertically)
-(define-key lesser-evil-leader-map "wm" 'maximize-window)
-(define-key lesser-evil-leader-map "ws" 'evil-window-split)
-(define-key lesser-evil-leader-map "wv" 'evil-window-vsplit)
-(define-key lesser-evil-leader-map "ww" 'other-window)
-
-(defhydra window-resize (lesser-evil-leader-map "wr")
-  "Window resizing"
-  ("j" shrink-window "shrink window")
-  ("k" enlarge-window "enlarge window")
-  ("h" shrink-window-horizontally "shrink window horizontally")
-  ("l" enlarge-window-horizontally "enlarge window horizontally"))
+(setq lesser-evil-default-font-size (face-attribute 'default :height))
 
 (defun lesser-evil-text-scale-reset ()
   (interactive)
   (text-scale-set 0))
-
-(defhydra buffer-font-size (lesser-evil-leader-map "bf")
-  "Buffer font"
-  ("-" text-scale-decrease "Decrease font size")
-  ("=" text-scale-increase "Increase font size")
-  ("0" lesser-evil-text-scale-reset "Reset font size"))
-
-(setq lesser-evil-default-font-size (face-attribute 'default :height))
 
 (defun lesser-evil-global-text-scale-reset ()
   (interactive)
@@ -146,66 +32,179 @@
                       (selected-frame)
                       :height (- (face-attribute 'default :height) 5)))
 
-(defhydra frame-font-size (lesser-evil-leader-map "wf")
-  "Frame font"
-  ("-" lesser-evil-global-text-scale-decrease "Decrease font size")
-  ("=" lesser-evil-global-text-scale-increase "Increase font size")
-  ("0" lesser-evil-global-text-scale-reset "Reset font size"))
+(defun lesser-evil-yank-buffer-filename ()
+  (interactive)
+  (kill-new (buffer-file-name)))
 
-(evil-define-key 'motion 'global (kbd "<leader>") lesser-evil-leader-map)
+(defun lesser-evil-switch-to-scratch ()
+  (interactive)
+  (switch-to-buffer "*scratch*"))
 
-(setq lesser-evil-keys-desc nil)
-(push '(nil
-	"<leader>a" "applications"
-	"<leader>b" "buffer"
-	"<leader>bs" "scratch"
-	"<leader>bf" "font size"
-	"<leader>f" "file"
-	"<leader>g" "git"
-	"<leader>h" "help"
-	"<leader>hd" "describe"
-	"<leader>n" "narrow"
-	"<leader>l" "layout"
-	"<leader>p" "project"
-	"<leader>q" "quit"
-	"<leader>s" "search"
-	"<leader>t" "toggle"
-	"<leader>w" "window"
-	"<leader>wf" "font size"
-	"<leader>wr" "resize"
-	) lesser-evil-keys-desc)
+(setq lesser-evil-leader-map (make-sparse-keymap))
 
-;; undo for windows
-(winner-mode)
-(define-key lesser-evil-leader-map "wu" 'winner-undo)
+(use-package evil
+  :init
+  ;; Unmap "SPC" so that it can be used by evil motion map
+  (define-key special-mode-map (kbd "SPC") nil)
+  (define-key Info-mode-map (kbd "SPC") nil)
+  (setq-default evil-symbol-word-search t)
+  (setq evil-flash-delay 8
+        evil-want-integration t
+        evil-want-keybinding nil
+        evil-move-beyond-eol t
+        evil-auto-balance-windows t)
 
-;; Info
-(evil-define-key 'motion Info-mode-map "n" 'evil-search-next)
-(evil-define-key 'motion Info-mode-map "gg" 'beginning-of-buffer)
-(evil-define-key 'motion Info-mode-map "gn" 'Info-goto-node)
+  :config
+  (evil-mode 1)
+  (evil-global-set-key 'motion (kbd "SPC") nil)
+  (evil-set-leader 'motion (kbd "SPC"))
+  (evil-set-leader 'motion (kbd ",") t)
+  (put 'narrow-to-region 'disabled nil)
+  (winner-mode)
+
+  (bind-keys :map lesser-evil-leader-map
+
+              ; Basic keybinding are inspired by spacemacs
+
+             (" "   . execute-extended-command)
+             ("TAB" . evil-switch-to-windows-last-buffer)
+             (":"   . eval-expression)
+             ("'"   . eshell)
+             ("!"   . shell-command)
+             ("u"   . universal-argument)
+
+             ("aC"  . calendar)
+             ("ac"  . calc-dispatch)
+             ("adb" . ediff-buffers)
+             ("add" . ediff-directories)
+             ("adf" . ediff-files)
+             ("ap"  . list-processes)
+             ("aP"  . proced)
+             
+             ("bb" . switch-to-buffer)
+             ("bd" . kill-current-buffer)
+             ("bD" . kill-buffer-and-window)
+             ("bk" . kill-current-buffer)
+             ("bn" . next-buffer)
+             ("bp" . previous-buffer)
+             ("br" . revert-buffer)
+             ("bs" . lesser-evil-switch-to-scratch)
+             
+             ("ff" . find-file)
+             ("fr" . recentf-open-files)
+             ("fs" . save-buffer)
+             ("fS" . write-file)
+             ("fy" . lesser-evil-yank-buffer-filename)
+             
+             ("hdf" . describe-function)
+             ("hdk" . describe-key)
+             ("hdf" . describe-face)
+             ("hdm" . describe-mode)
+             ("hdv" . describe-variable)
+             ("hdp" . describe-package)
+             ("ha"  . apropos)
+             ("hi"  . info)
+             ("hm"  . man)
+             ("hr"  . info-emacs-manual)
+
+             ("nd" . narrow-to-defun)
+             ("nr" . narrow-to-region)
+             ("nw" . widen)
+             
+             ("qq" . save-buffers-kill-terminal)
+             ("qQ" . kill-emacs)
+             ("qz" . delete-frame)
+             
+             ("sb" . occur)
+             ("sd" . find-dired)
+             ("sg" . find-grep)
+             ("ss" . occur)
+             ("so" . xref-find-definitions)
+             ("sO" . imenu)
+             ("sr" . xref-find-references)
+             
+             ("tf" . auto-fill-mode)
+             ("tl" . toggle-truncate-lines)
+             ("tn" . linum-mode)
+             
+             ("w=" . balance-windows)
+             ("wd" . evil-window-delete)
+             ("wD" . kill-buffer-and-window)
+             ("wF" . make-frame)
+             ("wh" . evil-window-left)
+             ("wj" . evil-window-down)
+             ("wk" . evil-window-up)
+             ("wl" . evil-window-right)
+             ("wH" . evil-window-move-far-left)
+             ("wJ" . evil-window-move-very-bottom)
+             ("wK" . evil-window-move-very-top)
+             ("wL" . evil-window-move-far-right)
+             ("wo" . delete-other-windows)
+             ("wO" . delete-other-windows-vertically)
+             ("wm" . maximize-window)
+             ("ws" . evil-window-split)
+             ("wv" . evil-window-vsplit)
+             ("ww" . other-window)
+             ("wu" 'winner-undo))
+
+  (defhydra window-resize (lesser-evil-leader-map "wr")
+    "Window resizing"
+    ("j" shrink-window "shrink window")
+    ("k" enlarge-window "enlarge window")
+    ("h" shrink-window-horizontally "shrink window horizontally")
+    ("l" enlarge-window-horizontally "enlarge window horizontally"))
+  
+  (defhydra buffer-font-size (lesser-evil-leader-map "bf")
+    "Buffer font"
+    ("-" text-scale-decrease "Decrease font size")
+    ("=" text-scale-increase "Increase font size")
+    ("0" lesser-evil-text-scale-reset "Reset font size"))
+  
+  (defhydra frame-font-size (lesser-evil-leader-map "wf")
+    "Frame font"
+    ("-" lesser-evil-global-text-scale-decrease "Decrease font size")
+    ("=" lesser-evil-global-text-scale-increase "Increase font size")
+    ("0" lesser-evil-global-text-scale-reset "Reset font size"))
+
+  (evil-define-key 'motion 'global (kbd "<leader>") lesser-evil-leader-map)
+
+  ;; Info
+  (evil-define-key 'motion Info-mode-map "n" 'evil-search-next)
+  (evil-define-key 'motion Info-mode-map "gg" 'beginning-of-buffer)
+  (evil-define-key 'motion Info-mode-map "gn" 'Info-goto-node)
+
+  (setq lesser-evil-keys-desc nil)
+  (push '(nil
+  	"<leader>a" "applications"
+  	"<leader>b" "buffer"
+  	"<leader>bs" "scratch"
+  	"<leader>bf" "font size"
+  	"<leader>f" "file"
+  	"<leader>g" "git"
+  	"<leader>h" "help"
+  	"<leader>hd" "describe"
+  	"<leader>n" "narrow"
+  	"<leader>l" "layout"
+  	"<leader>p" "project"
+  	"<leader>q" "quit"
+  	"<leader>s" "search"
+  	"<leader>t" "toggle"
+  	"<leader>w" "window"
+  	"<leader>wf" "font size"
+  	"<leader>wr" "resize"
+  	) lesser-evil-keys-desc)
+
+  )
 
 ;; calendar
 (evil-collection-init 'calendar)
 
-;; org
-(setq org-confirm-babel-evaluate nil)
-;; turn off auto-identation in src code blocks
-;; while this sounds like a good feature it is actually broken
-(setq org-src-tab-acts-natively nil)
+;;org
+(use-package evil-org
+  :hook (org-mode . evil-org-mode)
+  :config (evil-org-set-key-theme '(textobjects)))
 (define-key lesser-evil-leader-map "A" 'org-agenda)
 (define-key lesser-evil-leader-map "c" 'org-capture)
-(add-hook 'org-mode-hook #'org-bullets-mode)
-(add-hook 'org-mode-hook 'evil-org-mode)
-(with-eval-after-load 'evil-org
-  (evil-org-set-key-theme '(textobjects)))
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((python . t)
-   (sql . t)
-   (clojure . t)
-   (restclient . t)
-   (shell . t)
-   (emacs-lisp . t)))
 (setq org-local-leader-map (make-sparse-keymap))
 (evil-define-key 'normal org-mode-map
   "t" 'org-todo
@@ -327,7 +326,6 @@
   (define-key dired-mode-map "gG" 'dired-do-chgrp)
   (define-key dired-mode-map "{" 'dired-prev-subdir)
   (define-key dired-mode-map "}" 'dired-next-subdir))
-(setq image-dired-thumb-size 256)
 (evil-set-initial-state 'image-dired-thumbnail-mode 'emacs)
 (evil-set-initial-state 'image-dired-display-image-mode 'emacs)
 (with-eval-after-load 'image-dired
