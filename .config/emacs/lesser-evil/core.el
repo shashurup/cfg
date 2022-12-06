@@ -188,24 +188,11 @@
 (evil-collection-init 'calendar)
 
 ;; org
-(setq org-confirm-babel-evaluate nil)
-;; turn off auto-identation in src code blocks
-;; while this sounds like a good feature it is actually broken
-(setq org-src-tab-acts-natively nil)
 (define-key lesser-evil-leader-map "A" 'org-agenda)
 (define-key lesser-evil-leader-map "c" 'org-capture)
-(add-hook 'org-mode-hook #'org-bullets-mode)
 (add-hook 'org-mode-hook 'evil-org-mode)
 (with-eval-after-load 'evil-org
   (evil-org-set-key-theme '(textobjects)))
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((python . t)
-   (sql . t)
-   (clojure . t)
-   (restclient . t)
-   (shell . t)
-   (emacs-lisp . t)))
 (setq org-local-leader-map (make-sparse-keymap))
 (evil-define-key 'normal org-mode-map
   "t" 'org-todo
@@ -327,7 +314,6 @@
   (define-key dired-mode-map "gG" 'dired-do-chgrp)
   (define-key dired-mode-map "{" 'dired-prev-subdir)
   (define-key dired-mode-map "}" 'dired-next-subdir))
-(setq image-dired-thumb-size 256)
 (evil-set-initial-state 'image-dired-thumbnail-mode 'emacs)
 (evil-set-initial-state 'image-dired-display-image-mode 'emacs)
 (with-eval-after-load 'image-dired

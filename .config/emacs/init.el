@@ -65,16 +65,34 @@
       (delete-other-windows capture-win)
       (add-hook 'kill-buffer-hook 'delete-frame 0 t))
     ))
+(setq org-confirm-babel-evaluate nil)
+;; org
+;; turn off auto-identation in src code blocks
+;; while this sounds like a good feature it is actually broken
+(setq org-src-tab-acts-natively nil)
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((python . t)
+   (sql . t)
+   (clojure . t)
+   (restclient . t)
+   (shell . t)
+   (emacs-lisp . t)))
+(add-hook 'org-mode-hook #'org-bullets-mode)
+
+;; dired
+(setq image-dired-thumb-size 256)
+(setq dired-listing-switches "-l")
+(put 'dired-find-alternate-file 'disabled nil)
 
 (help-at-pt-set-timer)
 
 ;; theme
 ; (setq doom-henna-brighter-modeline t)
 ; (load-theme 'doom-henna t)
-;(load-theme 'doom-peacock t)
-;(setq doom-peacock-brighter-modeline t)
-
-(load-theme 'base16-gruvbox-dark-soft t)
+; (setq doom-peacock-brighter-modeline t)
+; (load-theme 'doom-peacock t)
+(load-theme 'doom-monokai-classic t)
 
 (load (concat user-emacs-directory "lesser-evil/core"))
 
@@ -132,5 +150,3 @@
 ;;   adwaita (светлая, если хочется серого фона, встроенная)
 ;;   deeper-blue (разноцветненько, встроенная)
 ;;   misterioso, tango-dark (тепло, разноцветно, но цвета коментов и строк непрактичные)
-
-(put 'dired-find-alternate-file 'disabled nil)
