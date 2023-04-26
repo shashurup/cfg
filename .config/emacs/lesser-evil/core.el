@@ -598,8 +598,32 @@
 ;(load (concat user-emacs-directory "ctrlj.el"))
 (load-from-this-dir "ctrlj")
 
-(load-from-this-dir "proj")
+;; Projects
+;; (load-from-this-dir "proj")
 
+(setq project-switch-commands
+  '((project-find-file "Find file")
+    (project-dired "Dired")
+    (project-eshell "Eshell")))
+
+(defun lesser-evil-proj-or-dir-ag ()
+  (interactive)
+  (if-let ((proj (project-current)))
+      (counsel-ag (ivy-thing-at-point)
+                  (car (project-roots proj)))
+    (counsel-ag (ivy-thing-at-point))))
+
+(defun lesser-evil-switch-proj-new-frame ()
+  (interactive)
+  (call-interactively 'project-switch-project)
+  (make-frame))
+
+(define-key lesser-evil-leader-map "pp" 'project-switch-project)
+(define-key lesser-evil-leader-map "p'" 'project-eshell)
+(define-key lesser-evil-leader-map "p!" 'project-shell-command)
+(define-key lesser-evil-leader-map "pd" 'project-dired)
+(define-key lesser-evil-leader-map "/" 'lesser-evil-proj-or-dir-ag)
+(define-key lesser-evil-leader-map "pF" 'lesser-evil-switch-proj-new-frame)
 
 ; winum
 (defun lesser-evil-find-window (w1 w2 num)
@@ -677,38 +701,44 @@
 (define-key company-active-map (kbd "C-k") 'company-select-previous)
 
 ;; layouts with perspective
-;; Switching layout function cannot be autoloaded
-;; and we cannot load perspective lazily
-;; so we use this hack to at least turn on
-;; perspective mode with familiar keybinding
 (setq persp-suppress-no-prefix-key-warning t)
-(define-key lesser-evil-leader-map "l" 'persp-mode)
-(with-eval-after-load 'perspective
+(persp-mode)
+(if (featurep 'ivy-rich)
+    (let ((cmd 'persp-ivy-switch-buffer)
+          (props (plist-get ivy-rich-display-transformers-list 'ivy-switch-buffer)))
+      (ivy-set-display-transformer cmd (ivy-rich-build-transformer cmd props))))
 
-  (if (featurep 'ivy-rich)
-      (let ((cmd 'persp-ivy-switch-buffer)
-	    (props (plist-get ivy-rich-display-transformers-list 'ivy-switch-buffer)))
-	(ivy-set-display-transformer cmd (ivy-rich-build-transformer cmd props))))
+(if (featurep 'counsel)
+    (define-key lesser-evil-leader-map "bb" 'persp-counsel-switch-buffer))
 
-  (if (featurep 'counsel)
-      (define-key lesser-evil-leader-map "bb" 'persp-counsel-switch-buffer))
+(define-key lesser-evil-leader-map "bs" 'persp-switch-to-scratch-buffer)
 
-  (define-key lesser-evil-leader-map "l" nil)
-  (define-key lesser-evil-leader-map "ll" 'persp-switch)
-  (define-key lesser-evil-leader-map (kbd "l TAB") 'persp-switch-last)
-  (define-key lesser-evil-leader-map
-              "ln"
-              (lambda (persp-name)
-		(interactive "sNew perspective name: ")
-		(let ((buf (current-buffer)))
-		  (persp-switch persp-name)
-		  (persp-set-buffer (buffer-name buf))
-		  (display-buffer buf))))
-  (define-key lesser-evil-leader-map "ld" 'persp-kill)
-  (define-key lesser-evil-leader-map "la" 'persp-add-buffer)
-  (define-key lesser-evil-leader-map "lr" (make-interactive persp-remove-buffer
-                                                            (current-buffer))))
+(define-key lesser-evil-leader-map "ll" 'persp-switch)
+(define-key lesser-evil-leader-map (kbd "l TAB") 'persp-switch-last)
+(define-key lesser-evil-leader-map
+  "ln"
+  (lambda (persp-name)
+    (interactive "sNew perspective name: ")
+    (let ((buf (current-buffer)))
+      (persp-switch persp-name)
+      (persp-set-buffer (buffer-name buf))
+      (display-buffer buf))))
+(define-key lesser-evil-leader-map "ld" 'persp-kill)
+(define-key lesser-evil-leader-map "la" 'persp-add-buffer)
+(define-key lesser-evil-leader-map "lr" (make-interactive persp-remove-buffer
+                                                          (current-buffer)))
 
+(defun lesser-evil-switch-proj-with-persp ()
+  (interactive)
+  (call-interactively 'project-switch-project)
+  (let* ((dir (project-root (project-current)))
+         (pname (file-name-nondirectory (directory-file-name dir)))
+         (buf (current-buffer)))
+    (persp-switch pname)
+    (persp-set-buffer buf)
+    (switch-to-buffer buf)))
+
+(define-key lesser-evil-leader-map "pl" 'lesser-evil-switch-proj-with-persp)
 
 ;; smartparens
 (show-smartparens-global-mode t)

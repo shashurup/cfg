@@ -35,7 +35,7 @@
 			  (directory-files dir)))))
 
 (defun lesser-evil-proj-file-list (proj)
-  (let ((dir (car (project-roots proj))))
+  (let ((dir (project-root proj)))
     (mapcar (lambda (f) (file-relative-name f dir))
 	    (cl-remove-if #'get-file-buffer
 			  (project-files proj)))))
