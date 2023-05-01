@@ -741,6 +741,7 @@
 (define-key lesser-evil-leader-map "pl" 'lesser-evil-switch-proj-with-persp)
 
 ;; smartparens
+(require 'smartparens-config)
 (show-smartparens-global-mode t)
 (smartparens-global-mode)
 (defhydra "smartparens" (lesser-evil-leader-map "k")
