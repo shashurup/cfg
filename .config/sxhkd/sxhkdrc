@@ -1,0 +1,161 @@
+
+# wm independent hotkeys
+#
+
+# terminal emulator
+super + Return
+	alacritty
+
+# program launcher
+super + space
+	rofi -show
+
+XF86AudioRaiseVolume
+  pamixer-with-notify --increase 10
+
+XF86AudioLowerVolume
+  pamixer-with-notify --decrease 10
+
+ctrl + XF86AudioRaiseVolume
+  pamixer-with-notify --set-volume 90
+
+ctrl + XF86AudioLowerVolume
+  pamixer-with-notify --set-volume 10
+
+XF86AudioMute
+  pamixer --toggle-mute
+
+XF86AudioMicMute
+  pactl set-source-mute 1 toggle
+
+XF86MonBrightnessUp
+  xbacklight -inc 10 && dunstify -r 4242 Яркость $(xbacklight -get)%
+
+XF86MonBrightnessDown
+  xbacklight -dec 10 && dunstify -r 4242 Яркость $(xbacklight -get)%
+
+XF86Display
+  xrandr --auto
+
+Print
+  screenshot-rect-to-clipboard
+
+# make sxhkd reload its configuration files:
+super + Escape
+      pkill -USR1 -x sxhkd && notify-send "sxhkd config has been reloaded"
+
+# org capture
+super + c
+  emacsclient -ce '(lesser-evil-org-capture-external-note)'
+
+#
+# bspwm hotkeys
+#
+
+# close and kill
+super + {_,shift + }w
+	bspc node -{c,k}
+
+#
+# Desktop
+#
+
+# alternate between the tiled and monocle layout
+super + semicolon
+	bspc desktop -l next
+
+super + u; s
+  notify-send -t 1024 "$(bspc query -D -d --names)@$(bspc query -M -m --names)"
+
+super + u; d
+  bspc desktop -r
+
+super + u; i
+  dsk_no=$(bspc query -D | wc -l); \
+  bspc monitor --add-desktops dsk$dsk_no; \
+  bspc desktop --focus "dsk$((dsk_no+1))"; \
+  notify-send -t 1024 "$(bspc query -D -d --names)@$(bspc query -M -m --names)"
+
+super + u; I
+  dsk_no=$(bspc query -D | wc -l); \
+  bspc monitor --add-desktops dsk$((dsk_no+1)); \
+  bspc node --to-desktop "dsk$((dsk_no+1))" --follow
+ 
+super + u; {h,j,k,l}
+  bspc desktop --to-monitor {west, south, north, east}
+
+# focus the next/previous desktop in the current monitor
+super + bracket{left,right}
+	bspc desktop --focus {prev,next}.local
+
+# focus to the given desktop
+# super + {1,2,3,4,5,6,7,8,9,0}
+# 	bspc desktop --focus '{comm,browser,emacs,term,dsk5,dsk6,dsk7,dsk8,dsk9,dsk0}' \
+#   || notify-send -u critical -t 512 'No such desktop'
+
+# focus given workspace
+super + {1,2,3,4,5,6,7,8,9,0}
+  pattern='^{1,2,3,4,5,6,7,8,9,0}-'; \
+  exists=; \
+  for dsk in $(bspc query -D --names | grep $pattern); \
+  do \
+    exists=yes; \
+    bspc desktop --focus $dsk; \
+  done; \
+  test -z $exists && notify-send -u critical -t 512 'No such workspace'
+
+#
+# Node
+#
+
+# set the window state
+super + {e,r,t}
+	bspc node -t {tiled,pseudo_tiled,floating}
+
+# focus
+
+super + {h,j,k,l}
+        bspc node --focus {west,south,north,east}
+
+# focus the next/previous node in the current desktop
+super + {_,shift +} n
+	bspc node --focus {next,prev}.leaf.local
+
+# focus parent node
+super + p
+        bspc node --focus @parent
+
+# focus the last node
+super + Tab
+	bspc node --focus last
+
+# move
+
+# move node
+super + shift + {h,j,k,l}
+        bspwm-smart-placement move {west,south,north,east}
+
+# send to the given desktop
+# super + shift + {1,2,3,4,5,6,7,8,9,0}
+# 	bspc node --to-desktop '{comm,browser,emacs,term,dsk5,dsk6,dsk7,dsk8,dsk9,dsk0}' --follow \
+#   || notify-send -u critical -t 512 'No such desktop'
+
+# resize
+
+super + o
+  bspwm-smart-placement cycle_size
+
+super + y: {u,o,m,period}
+  bspc node --resize {top_left -40 -40, top_right 40 -40, bottom_left -40 40, bottom_right 40 40}
+
+super + y: {U,O,M,greater}
+  bspc node --resize {top_left 40 40, top_right -40 40, bottom_left 40 -40, bottom_right -40 -40}
+
+super + y: {j,i,l,comma}
+  bspc node --resize {left -40 0, top 0 -40, right 40 0, bottom 0 40}
+
+super + y: {J,I,L,less}
+  bspc node --resize {left 40 0, top 0 40, right -40 0, bottom 0 -40}
+
+super + i:
+  python /home/georgy/devel/rofi-bspwm.py

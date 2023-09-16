@@ -1,0 +1,30 @@
+#!/bin/sh
+
+sxhkd &
+
+#python ~/devel/uglyugly.py &> /dev/null &
+kbdd
+
+bspc config window_gap 0
+bspc config border_width 4
+bspc config focused_border_color '#80c080'
+bspc config active_border_color '#808080'
+bspc config normal_border_color '#404040'
+
+bspc config top_monocle_padding 10
+bspc config bottom_monocle_padding 10
+bspc config left_monocle_padding 20
+bspc config right_monocle_padding 20
+
+bspc config borderless_singleton true
+
+bspc config pointer_follows_focus true
+bspc config pointer_follows_monitor true
+bspc config remove_unplugged_monitors true
+
+bspc rule --add '*' state=floating
+
+bspc monitor HDMI-1 -a 1-comm 2-scratch
+bspc monitor DP-1 -a 1-comm_ 2-scratch_
+bspc desktop -r
+polybar my &
