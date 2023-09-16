@@ -1,0 +1,9 @@
+[Unit]
+Description=Use random images from ~/wallpapers folder
+
+[Service]
+Type=forking
+ExecStart=sh -c 'xwallpaper --daemon --stretch $(ls ~/wallpapers/* | shuf -n 1)'
+
+[Install]
+WantedBy=default.target

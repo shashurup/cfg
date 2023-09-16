@@ -1,0 +1,9 @@
+[Unit]
+Description=Changes wallpapers each morning at 5 AM
+
+[Timer]
+Persistent=true
+OnCalendar=05:00
+
+[Install]
+WantedBy=default.target
