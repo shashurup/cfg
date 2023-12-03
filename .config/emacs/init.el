@@ -1,5 +1,5 @@
 ;; Common vars
-(setq user-full-name "first last"
+(setq user-full-name "Георгий Кибардин"
       ispell-dictionary "english"
       ns-command-modifier 'control
       backup-directory-alist `(("." . ,(concat user-emacs-directory "backups")))
@@ -10,22 +10,18 @@
 				 "Июнь" "Июль" "Август" "Сентябрь"
 				 "Октябрь" "Ноябрь" "Декабрь"])
 
+
 ;; Appearence
 (setq inhibit-startup-screen t)
 (menu-bar-mode -99)
 (scroll-bar-mode -1)
+(tool-bar-mode -1)
 (setq visible-bell 1)
-(column-number-mode)
+(setq column-number-mode t)
 (setq-default indent-tabs-mode nil)
 (setq-default tab-width 4)
 
-;; Package initialization
-(require 'package)
-(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
-(package-initialize)
-;; Do not initialize packages again after init
-(setq package-enable-at-startup nil)
-
+;; Make wider margins for documentation modes
 (defun set-comfortable-margins ()
   (setq left-margin-width 1
 	right-margin-width 1)
@@ -41,78 +37,269 @@
 (with-eval-after-load 'eww
   (add-hook 'eww-mode-hook 'set-comfortable-margins))
 
+
+;; Packages
+(require 'package)
+(add-to-list 'package-archives '("melpa" . "http://melpa.org/packages/"))
+;; Install packages automatically
+(require 'use-package-ensure)
+(setq use-package-always-ensure t)
+
+(savehist-mode)
+
+(recentf-mode)
+
+(pixel-scroll-precision-mode)
+
+
+;; Modes to highlight the current line with
+(let ((hl-line-hooks '(text-mode-hook prog-mode-hook)))
+  (mapc (lambda (hook) (add-hook hook 'hl-line-mode)) hl-line-hooks))
+
+
+(setq space-map (make-sparse-keymap))
+(set-keymap-parent space-map ctl-x-map)
+
+
+(use-package ob-restclient)
+
+
 ;; org
-(setq org-directory "~/org")
-(setq org-default-notes-file (concat org-directory "/notes.org"))
-(setq org-agenda-files (list (concat org-directory "/my.org")
-                             (concat org-directory "/projects")))
-(setq org-refile-targets '((org-agenda-files . (:level . 1))))
-(setq org-capture-templates
-      '(("t" "Todo" entry (file "")
-         "* TODO %?\n  %i\n  %a")
-        ("c" "Note" entry (file "")
-         "* %?\n  %i\n  %a")
-        ("e" "External note (from clipboard)" entry (file "")
-         "* %?\n  %x")
-        ))
-(defun lesser-evil-org-capture-external-note ()
-  (interactive)
-  (let ((org-capture-p (lambda (w)
-                         (string-prefix-p "CAPTURE-"
-                                          (buffer-name (window-buffer w))))))
-    (org-capture nil "e")
-    (let ((capture-win (seq-find org-capture-p (window-list))))
-      (delete-other-windows capture-win)
-      (add-hook 'kill-buffer-hook 'delete-frame 0 t))
-    ))
-(setq org-confirm-babel-evaluate nil)
-;; org
-;; turn off auto-identation in src code blocks
-;; while this sounds like a good feature it is actually broken
-(setq org-src-tab-acts-natively nil)
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((python . t)
-   (sql . t)
-   (clojure . t)
-   (restclient . t)
-   (shell . t)
-   (emacs-lisp . t)))
-(add-hook 'org-mode-hook #'org-bullets-mode)
+(use-package org
+  :defer t
+  :after ob-restclient
+  :config (progn
+            (setq org-directory "~/org"
+                  org-default-notes-file (concat org-directory "/notes.org")
+                  org-agenda-files (list (concat org-directory "/my.org")
+                                         (concat org-directory "/projects"))
+                  org-refile-targets '((org-agenda-files . (:level . 1)))
+                  org-capture-templates '(("t" "Todo" entry (file "")
+                                           "* TODO %?\n  %i\n  %a")
+                                          ("c" "Note" entry (file "")
+                                           "* %?\n  %i\n  %a")
+                                          ("e" "External note (from clipboard)" entry (file "")
+                                           "* %?\n  %x"))
+                  ;; turn off auto-identation in src code blocks
+                  ;; while this sounds like a good feature it is actually broken
+                  org-confirm-babel-evaluate nil
+                  org-src-tab-acts-natively nil
+                  org-babel-load-languages '((python . t)
+                                             (sql . t)
+                                             (clojure . t)
+                                             (restclient . t)
+                                             (shell . t)
+                                             (emacs-lisp . t)))
+            (defun my-org-capture-external-note ()
+              (interactive)
+              (let ((org-capture-p (lambda (w)
+                                     (string-prefix-p "CAPTURE-"
+                                                      (buffer-name (window-buffer w))))))
+                (org-capture nil "e")
+                (let ((capture-win (seq-find org-capture-p (window-list))))
+                  (delete-other-windows capture-win)
+                  (add-hook 'kill-buffer-hook 'delete-frame 0 t))))
+            ;; Shows link target in the status line when hovered
+            (help-at-pt-set-timer)))
+
+
+(use-package evil-org
+  :after (org evil)
+  :hook (org-mode . evil-org-mode)
+  :config (progn
+            (evil-org-set-key-theme '(navigation
+                                      insert
+                                      textobjects
+                                      additional
+                                      calendar
+                                      todo
+                                      heading
+                                      return))
+            (require 'evil-org-agenda)
+            (evil-org-agenda-set-keys)))
+
+
+(use-package org-superstar
+  :after org
+  :hook (org-mode . (lambda () (org-superstar-mode 1))))
+
+
+;; Evil
+(use-package evil
+  :init (progn
+          (setq-default evil-symbol-word-search t)
+          (setq evil-flash-delay 8
+                evil-want-integration t
+                evil-want-keybinding nil
+                evil-move-beyond-eol t
+                evil-auto-balance-windows t
+                evil-undo-system 'undo-redo))
+  :bind (:map space-map
+              ("SPC" . #'execute-extended-command)
+              (":" . #'eval-expression)
+              ("f" . #'find-file))
+  :config (progn
+            (evil-mode 1)
+            (evil-global-set-key 'motion (kbd "SPC") space-map)
+
+            (defun my-letter-p (ch)
+              (and (>= ch 97) (<= ch 122)))
+
+            ;; Builds a new keymap from major mode map
+            (defun my-build-comma-map (source-map)
+              (let ((result (make-sparse-keymap)))
+                (map-keymap (lambda (k v)
+                              (let ((mods (event-modifiers k))
+                                    (ch (event-basic-type k)))
+                                (if (equal mods '(control))
+                                    (when (my-letter-p ch)
+                                      (keymap-set result (single-key-description ch) v))
+                                  (when (not (my-letter-p ch))
+                                    (keymap-set result (single-key-description k) v)))))
+                            source-map)
+                result))
+
+            ;; Automatically generate new normal mode bindings for major modes
+            ;; so that "C-c C-e" is augmented with ", e"
+            ;; and "C-c #" makes ", #"
+            (defun my-setup-comma-map ()
+              (let* ((mm-map (current-local-map))
+                     (c-c-map (keymap-lookup mm-map "C-c")))
+                (when (and c-c-map) ;; TODO check comma map is already installed
+                  (let ((comma-map (my-build-comma-map c-c-map)))
+                    (when (cdr comma-map)  ;; keymap is not empty
+                      (evil-define-key 'motion mm-map "," comma-map)
+                      (message "Made a new map for %s !!!!" major-mode)
+                      )))))
+
+            (add-hook 'after-change-major-mode-hook #'my-setup-comma-map)))
+
+
+(use-package evil-collection
+  :after evil
+  :config (evil-collection-init))
+
+
+(use-package which-key
+  :config (which-key-mode))
+
+
+(use-package map)
+
+(use-package consult
+  :after map
+  :bind (("C-x b" . consult-buffer)
+         ("C-x p b" . consult-project-extra-find)
+         :map space-map
+         ("j" . my-jump))
+  :config (progn
+            (defun my-jump ()
+              (interactive)
+              (consult-buffer (list  consult--source-hidden-buffer
+                                     consult--source-buffer
+                                     (map-merge 'plist
+                                                consult--source-recent-file
+                                                '(:narrow ?r :hidden t))
+                                     consult-project-extra--source-file
+                                     (map-merge 'plist
+                                                consult-project-extra--source-project
+                                                '(:hidden t)))))
+            ))
+
+
+(use-package consult-ag
+  :after consult
+  :bind (:map space-map
+              ("/" . consult-ag)))
+
+
+(use-package consult-eglot
+  :after consutl)
+
+
+(use-package consult-project-extra
+  :after consult)
+
+
+(use-package embark
+  :bind (("C-c a" . embark-act)
+         :map space-map
+         ("." . embark-act)
+         :map embark-buffer-map
+         ("f" . switch-to-buffer-other-frame)))
+
+
+(use-package embark-consult
+  :after (consult embark))
+
+
+(use-package vertico
+  :config (vertico-mode)
+  :bind (:map vertico-map
+              ("C-j" . #'vertico-next)
+              ("C-k" . #'vertico-previous)))
+
+
+(use-package marginalia
+  :config (marginalia-mode))
+
+
+(use-package corfu
+  :init (setq corfu-auto t)
+  :config (global-corfu-mode))
+
+
+(use-package orderless
+  :config (setq completion-styles '(orderless)))
+
+
+(use-package magit)
+
+
+(use-package markdown-mode
+  :hook ((markdown-mode . visual-line-mode)))
+
+
+(use-package yaml-mode
+  :ensure t)
+
+
+(use-package json-mode
+  :ensure t)
+
+
+(use-package cider)
+
+
+(use-package smartparens
+  :hook (prog-mode text-mode)
+  :config (progn
+            (show-smartparens-global-mode t)
+            (smartparens-global-mode)
+            (require 'smartparens-config)))
+
+
+(use-package evil-cleverparens
+  :after evil
+  :hook (emacs-lisp-mode clojure-mode))
 
 ;; dired
 (setq image-dired-thumb-size 256)
 (setq dired-listing-switches "-l")
 (put 'dired-find-alternate-file 'disabled nil)
 
-(help-at-pt-set-timer)
 
-;; theme
-; (setq doom-henna-brighter-modeline t)
-; (load-theme 'doom-henna t)
-; (setq doom-peacock-brighter-modeline t)
-; (load-theme 'doom-peacock t)
-; (load-theme 'doom-monokai-classic t)
-; (load-theme 'doom-gruvbox t)
-(load-theme 'doom-material t)
-
-(load (concat user-emacs-directory "lesser-evil/core"))
-
-(savehist-mode)
-
-(frames-only-mode)
-
-;; (server-start)
+;; Open new frames by default so that window manager
+;; can be used for managing windows
+;; !!!!!!!!! incompatible with embark
+;; (use-package frames-only-mode
+;;   :config (frames-only-mode))
 
 
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages
-   '(frames-only-mode hsluv counsel f lsp-docker lsp-ivy lsp-java lsp-mode lsp-ui avy yaml-mode epc deferred ctable pyenv-mode elpy plantuml-mode base16-theme htmlize lua-mode ivy-xref ctags-update ggtags markdown-mode ivy-hydra evil-org evil-text-object-python ob-restclient restclient hydra cider smartparens perspective mu4e-alert smooth-scrolling doom-themes humanoid-themes kaolin-themes company ag org-bullets winum which-key ivy-rich evil-collection ivy evil magit))
- '(tool-bar-mode nil))
+;; Themes
+(use-package doom-themes
+  :config (load-theme 'doom-material t))
+
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
@@ -122,35 +309,9 @@
  '(default ((t (:height 65 :family "DejaVu Sans Mono"))))
  '(fixed-pitch-serif ((t (:height 1.1 :family "Linux Libertine Mono O"))))
  '(variable-pitch ((t (:height 1.1 :family "DejaVu Sans")))))
-
-
-;; Themes to consider:
-;;   wombat (встроенная, чуть менее контрастно чем dakrone, но меньше цветов)
-;;   doom-city-lights (средний контраст, разноцветная)
-;;   doom-gruvbox (приятная, теплая менее контрастная чем monokai)
-;;   doom-henna (средний контраст, зеленый, голубой) ++
-;;   doom-laserwave (интересная тема пурпурного оттенка)
-;;   doom-material (очень неплохо на среднем контрасте)
-;;   doom-monokai-pro (чуть менее контрастная чем классический monokai)
-;;   doom-one (очень неплохо на среднем контрасте)
-;;   doom-opera (еще один интересный вариант на слабом контрасте)
-;;   doom-palenight (средний контраст, неброско)
-;;   doom-peacock (теплая, без броских цветов как в monokai) ++
-;;   doom-solarized-dark and light (выглядит вроде получше классических) 
-;;   doom-space-gray (еще одна слабоконтрастная с неплохой гаммой) ++
-;;   doom-tomorrow-night (среднеконтрастная)
-;;   doom-vibrant (средний контраст, неброские цвета, нелохая альтернатива dakrone)
-;;   doom-wilmersdorf (еще одна слабоконтрастная с неплохой прохладной гаммой)
-;;   humanoid-dark (средний контраст, синезеленоголубая с морскими оттенками) ++
-;;   kaolin-blossom (коричнево-пурпурно)
-;;   kaolin-bubblegum (контраст, фиолетово-бирюзовый)
-;;   kaolin-dark (слабый контраст едва различимые оттенки зеленого)
-;;   kaolin-eclipse (как blossom, только холоднее)
-;;   kaolin-galaxy (контраст, бирюзовый и пурпурный)
-;;   kaolin-mono-dark (слабый контраст, оттенки бирюзового)
-;;   kaolin-ocean (контраст, разноцветная и прохладная)
-;;   kaolin-temple (похожа на vim'овский desert)
-;;   kaolin-valley-dark (похожа на ocean, только теплее)
-;;   adwaita (светлая, если хочется серого фона, встроенная)
-;;   deeper-blue (разноцветненько, встроенная)
-;;   misterioso, tango-dark (тепло, разноцветно, но цвета коментов и строк непрактичные)
+(custom-set-variables
+ ;; custom-set-variables was added by Custom.
+ ;; If you edit it by hand, you could mess it up, so be careful.
+ ;; Your init file should contain only one such instance.
+ ;; If there is more than one, they won't work right.
+ '(package-selected-packages '(doom-themes frames-only-mode)))
