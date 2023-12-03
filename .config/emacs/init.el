@@ -309,9 +309,3 @@
  '(default ((t (:height 65 :family "DejaVu Sans Mono"))))
  '(fixed-pitch-serif ((t (:height 1.1 :family "Linux Libertine Mono O"))))
  '(variable-pitch ((t (:height 1.1 :family "DejaVu Sans")))))
-(custom-set-variables
- ;; custom-set-variables was added by Custom.
- ;; If you edit it by hand, you could mess it up, so be careful.
- ;; Your init file should contain only one such instance.
- ;; If there is more than one, they won't work right.
- '(package-selected-packages '(doom-themes frames-only-mode)))
