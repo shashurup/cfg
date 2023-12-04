@@ -22,20 +22,31 @@
 (setq-default tab-width 4)
 
 ;; Make wider margins for documentation modes
-(defun set-comfortable-margins ()
+(defun my-set-comfortable-margins ()
   (setq left-margin-width 1
 	right-margin-width 1)
   (when-let ((w (get-buffer-window (current-buffer))))
     (set-window-buffer w (current-buffer))))
 
 (with-eval-after-load 'info
-  (add-hook 'Info-mode-hook 'set-comfortable-margins))
+  (add-hook 'Info-mode-hook 'my-set-comfortable-margins))
 
 (with-eval-after-load 'help
-  (add-hook 'help-mode-hook 'set-comfortable-margins))
+  (add-hook 'help-mode-hook 'my-set-comfortable-margins))
 
 (with-eval-after-load 'eww
-  (add-hook 'eww-mode-hook 'set-comfortable-margins))
+  (add-hook 'eww-mode-hook 'my-set-comfortable-margins))
+
+
+(defun my-convert-window-to-frame ()
+  (interactive)
+  (let ((to-delete (selected-window))
+        (has-other-windows (cdr (window-list))))
+    (make-frame)
+    (when has-other-windows
+      (delete-window to-delete))))
+
+(global-set-key (kbd "C-x 5 6") 'my-convert-window-to-frame)
 
 
 ;; Packages
