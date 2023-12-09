@@ -217,14 +217,15 @@
                                      consult-project-extra--source-file
                                      (map-merge 'plist
                                                 consult-project-extra--source-project
-                                                '(:hidden t)))))
-            ))
+                                                '(:hidden t)))))))
 
 
 (use-package consult-ag
   :after consult
   :bind (:map space-map
-              ("/" . consult-ag)))
+              ("/" . (lambda () 
+                       (interactive)
+                       (consult-ag nil (thing-at-point 'symbol))))))
 
 
 (use-package consult-eglot
