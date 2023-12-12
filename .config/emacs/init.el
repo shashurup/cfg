@@ -137,6 +137,35 @@
   :after org
   :hook (org-mode . (lambda () (org-superstar-mode 1))))
 
+(defun my-letter-p (ch)
+  (and (>= ch 97) (<= ch 122)))
+
+
+;; Builds a new keymap from major mode map
+(defun my-build-comma-map (source-map)
+  (let ((result (make-sparse-keymap)))
+    (map-keymap (lambda (k v)
+                  (let ((mods (event-modifiers k))
+                        (ch (event-basic-type k)))
+                    (if (equal mods '(control))
+                        (when (my-letter-p ch)
+                          (keymap-set result (single-key-description ch) v))
+                      (when (not (my-letter-p ch))
+                        (keymap-set result (single-key-description k) v)))))
+                source-map)
+    result))
+
+
+;; Automatically generate new normal mode bindings for major modes
+;; so that "C-c C-e" is augmented with ", e"
+;; and "C-c #" makes ", #"
+(defun my-install-comma-map (kmap)
+  (let ((c-c-map (keymap-lookup kmap "C-c")))
+    (when (and c-c-map) ;; TODO check comma map is already installed
+      (let ((comma-map (my-build-comma-map c-c-map)))
+        (when (cdr comma-map)  ;; keymap is not empty
+          (evil-define-key 'motion kmap "," comma-map))))))
+
 
 ;; Evil
 (use-package evil
@@ -155,38 +184,8 @@
   :config (progn
             (evil-mode 1)
             (evil-global-set-key 'motion (kbd "SPC") space-map)
-
-            (defun my-letter-p (ch)
-              (and (>= ch 97) (<= ch 122)))
-
-            ;; Builds a new keymap from major mode map
-            (defun my-build-comma-map (source-map)
-              (let ((result (make-sparse-keymap)))
-                (map-keymap (lambda (k v)
-                              (let ((mods (event-modifiers k))
-                                    (ch (event-basic-type k)))
-                                (if (equal mods '(control))
-                                    (when (my-letter-p ch)
-                                      (keymap-set result (single-key-description ch) v))
-                                  (when (not (my-letter-p ch))
-                                    (keymap-set result (single-key-description k) v)))))
-                            source-map)
-                result))
-
-            ;; Automatically generate new normal mode bindings for major modes
-            ;; so that "C-c C-e" is augmented with ", e"
-            ;; and "C-c #" makes ", #"
-            (defun my-setup-comma-map ()
-              (let* ((mm-map (current-local-map))
-                     (c-c-map (keymap-lookup mm-map "C-c")))
-                (when (and c-c-map) ;; TODO check comma map is already installed
-                  (let ((comma-map (my-build-comma-map c-c-map)))
-                    (when (cdr comma-map)  ;; keymap is not empty
-                      (evil-define-key 'motion mm-map "," comma-map)
-                      (message "Made a new map for %s !!!!" major-mode)
-                      )))))
-
-            (add-hook 'after-change-major-mode-hook #'my-setup-comma-map)))
+            (add-hook 'after-change-major-mode-hook
+                      (lambda () (my-install-comma-map (current-local-map))))))
 
 
 (use-package evil-collection
@@ -283,7 +282,11 @@
   :ensure t)
 
 
-(use-package cider)
+(use-package cider
+  ;; By default comma (local leader) map
+  ;; is installed only for major modes
+  ;; for cider a lot of interactions happen in its minor mode
+  :config (my-install-comma-map cider-mode-map))
 
 
 (use-package smartparens
