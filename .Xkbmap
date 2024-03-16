@@ -1,0 +1,1 @@
+-model pc105 -layout us,ru -option grp:caps_toggle -option ctrl:swap_lalt_lctl -option ctrl:swap_ralt_rctl
