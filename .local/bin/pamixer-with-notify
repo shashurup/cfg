@@ -1,0 +1,4 @@
+#!/bin/sh
+pamixer "$@"
+vol=$(pamixer --get-volume)
+dunstify -r 42 -t 2000 "Громкость $vol%"

@@ -1,0 +1,154 @@
+#!/etc/profiles/per-user/georgy/bin/python3
+
+import json
+from math import floor
+import subprocess
+import sys
+
+GAP = 16
+DIR_MAP = {'left': ('x', -1),  'right': ('x', 1),
+           'west': ('x', -1),  'east': ('x', 1),
+           'up': ('y', -1),    'down': ('y', 1),
+           'north': ('y', -1), 'south': ('y', 1)}
+
+
+def bspc_run(args):
+    subprocess.run('bspc '+ args, shell=True)
+
+
+def bspc_query(args):
+    return json.loads(subprocess.check_output('bspc query ' + args, shell=True))
+
+def find_next_size2(win_size, monitor_size):
+    win_width, win_height = win_size
+    mon_width, mon_height = monitor_size
+    tall = win_height > mon_height * 0.8
+    wide = win_width > mon_width * 0.6
+    if tall and wide:
+        return mon_width / 2, mon_height * 0.95                  # tall window
+    if tall:
+        return mon_width * 0.66, mon_width * 0.66 * 9 / 16       # 16:9 window
+    if wide:
+        return mon_width * 0.95, mon_height * 0.95               # almost fullscreen
+    return mon_width / 2, mon_height * 0.95                      # tall window
+
+def set_floating_window_size2(cur_rect, size, monitor_size):
+    cur_width, cur_height = rect['width'], rect['height']
+    top, left = rect['y'], rect['x']
+    new_width, new_height = size
+    mon_width, mon_height = monitor_size
+
+    new_top = (mon_height - new_height) / 2
+    new_left = (mon_width - new_width) / 2
+    bspc_run(f'node --move {new_left - left} {new_top - top}')
+    bspc_run(f'node --resize bottom_right {new_width - cur_width} {new_height - cur_height}')
+
+def figure_position(rect, monitor_size):
+    width, height = rect['width'], rect['height']
+    top, left = rect['y'], rect['x']
+    mon_width, mon_height = monitor_size
+    top_gap, left_gap = top, left
+    bottom_gap = mon_height - (top + height)
+    right_gap = mon_width - (left + width)
+    pos_x = 0
+    diff = left_gap - right_gap
+    if diff > GAP:
+        pos_x = 1
+    if diff < -GAP:
+        pos_x = -1
+    pos_y = 0
+    diff = top_gap - bottom_gap
+    if diff > GAP:
+        pos_y = 1
+    if diff < -GAP:
+        pos_y = -1
+    return {'x': pos_x, 'y': pos_y}
+        
+
+def set_floating_position(rect, pos, monitor_size):
+    width, height = rect['width'], rect['height']
+    top, left = rect['y'], rect['x']
+    mon_width, mon_height = monitor_size
+
+    center_x = [mon_width // 6, mon_width // 2, mon_width * 5 // 6][pos['x'] + 1]
+    new_left = center_x - width // 2
+    new_rigth = new_left + width
+    if new_rigth > mon_width - GAP:
+        new_left -= new_rigth - (mon_width - GAP)
+    if new_left < GAP:
+        new_left = GAP
+
+    center_y = [mon_height // 6, mon_height // 2, mon_height * 5 // 6][pos['y'] + 1]
+    new_top = center_y - height // 2
+    new_bottom = new_top + height
+    if new_bottom > mon_height - GAP:
+        new_top -= new_bottom - (mon_height - GAP)
+    if new_top < GAP:
+        new_top = GAP
+
+    dx = new_left - left 
+    dy = new_top - top
+    if dx or dy:
+        bspc_run(f'node --move {dx} {dy}')
+
+
+def limit_range(num):
+    if num > 1:
+        return 1
+    if num < -1:
+        return -1
+    return num
+
+
+SPLIT_RATIOS = [0.33, 0.5, 0.66]
+
+
+def figure_next_ratio(node):
+    cur_ratio = node['splitRatio']
+    for r in SPLIT_RATIOS:
+        if cur_ratio < r:
+            return r
+    return SPLIT_RATIOS[0]
+
+
+monitor = bspc_query('--tree --monitor')
+mon_height = monitor['rectangle']['height']
+mon_width = monitor['rectangle']['width']
+mon_left = monitor['rectangle']['x']
+mon_top = monitor['rectangle']['y']
+
+node = bspc_query('--tree --node')
+#from pprint import pprint as pp
+#pp(node)
+
+if len(sys.argv) > 1:
+    client = node.get('client')
+    if client and client['state'] == 'floating':
+        rect = node['client']['floatingRectangle']
+        rect['x'] -= mon_left
+        rect['y'] -= mon_top
+        if sys.argv[1] == 'cycle_size':
+            width, height = rect['width'], rect['height']
+            new_size = find_next_size2((width, height), (mon_width, mon_height))
+            set_floating_window_size2(rect, new_size, (mon_width, mon_height))
+        elif sys.argv[1] == 'move':
+            axis, step = DIR_MAP.get(sys.argv[2], ('x', 0))
+            pos = figure_position(rect, (mon_width, mon_height))
+            pos[axis] = limit_range(pos[axis] + step)
+            set_floating_position(rect, pos, (mon_width, mon_height))
+        elif sys.argv[1] == 'place':
+            x,y = [int(x) for x in sys.argv[2:4]] if len(sys.argv) > 3 else (0,0)
+            set_floating_position(rect, {'x': x, 'y': y}, (mon_width, mon_height))
+    else:
+        if sys.argv[1] == 'move':
+            bspc_run(f'node --to-node {sys.argv[2]} --follow')
+        elif sys.argv[1] == 'place':
+            bspc_run(f'node --to-node $(bspwm-find-grid-node {sys.argv[2]} {sys.argv[3]}) --follow')
+        elif sys.argv[1] == 'cycle_size':
+            if client:
+                node = bspc_query('-T -n @parent')
+            ratio = figure_next_ratio(node)
+            if client:
+                bspc_run(f'node @parent --ratio {ratio}')
+            else:
+                bspc_run(f'node --ratio {ratio}')

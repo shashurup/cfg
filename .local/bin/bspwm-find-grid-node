@@ -1,0 +1,82 @@
+#!/etc/profiles/per-user/georgy/bin/python3
+
+import json
+import subprocess
+import sys
+
+
+CORNER_MAP = {(-1, -1): ('x', 'y'), (1, -1): ('x1', 'y'),
+              (-1, 1): ('x', 'y1'), (1, 1): ('x1', 'y1')}
+
+SIDE_MAP = {(-1, 0): ('x', 'y', 0), (1, 0): ('x1', 'y', -1),
+            (0, -1): ('y', 'x', 0), (0, 1): ('y1', 'x', -1)}
+
+def squared_distance(point1, point2):
+    dx = point2[0] - point1[0]
+    dy = point2[1] - point1[1]
+    return dx * dx + dy * dy
+
+
+def get_point(rect, corner):
+    x_name, y_name = CORNER_MAP[corner]
+    return rect[x_name], rect[y_name]
+
+
+def augment_rect(rect):
+    rect['x1'] = rect['x'] + rect['width']
+    rect['y1'] = rect['y'] + rect['height']
+
+
+def find_clients(data):
+    if data:
+        client = data.get('client')
+        if client:
+            rect = client['tiledRectangle']
+            rect['id'] = data.get('id')
+            rect['name'] = client.get('instanceName')
+            augment_rect(rect)
+            if client.get('state') == 'tiled':
+                return [rect]
+        else:
+            return find_clients(data.get('firstChild')) + find_clients(data.get('secondChild'))
+    return []
+
+
+def find_corner_node(mon_rect, clients, corner):
+    p1 = get_point(mon_rect, corner)
+    return min(clients, key=lambda c: squared_distance(p1, get_point(c, corner)))
+
+
+def find_side_node(clients, side):
+    v1, v2, pos = SIDE_MAP[side]
+    clients.sort(key=lambda c: (c[v1], c[v2]))
+    val = clients[pos][v1]
+    side_clients = [c for c in clients if c[v1] == val]
+    side_pos = (((len(side_clients)) + 1) // 2) - 1
+    #from pprint import pprint as pp
+    #print('=' * 64)
+    #print(v1, v2, pos)
+    #pp(side_clients)
+    return side_clients[side_pos]
+
+
+if len(sys.argv) > 1:
+    tree = json.loads(subprocess.check_output(['bspc', 'query', '--tree', '--desktop']))
+    root = tree['root']
+    mon_rect = root['rectangle']
+    augment_rect(mon_rect)
+    clients = find_clients(root)
+    #from pprint import pprint as pp
+    #pp(clients)
+    if clients:
+        x, y = [int(arg) for arg in sys.argv[1:3]]
+        if x and y:
+            node = find_corner_node(mon_rect, clients, (x, y))
+        elif x or y:
+            node = find_side_node(clients, (x, y))
+        else:
+            node = clients[0]
+        #pp(node)
+        print(node['id'])
+else:
+    print(f'Usage:\n\t{sys.argv[0]} x y')

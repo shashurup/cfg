@@ -1,0 +1,9 @@
+#!/bin/sh
+rect=$(hacksaw -g 2 -c ff8000)
+test $? -eq 0 || exit
+shotfile=$(mktemp --suffix=.png)
+test -n "$1" && sleep $1
+shotgun -g $rect $shotfile
+lazpaint $shotfile -editor [Window]ColorWindowVisible=0,LayerWindowVisible=0,[Tool]ForeColor=FF0000FF,BackColor=00000000 $shotfile
+xclip -t 'image/png' -selection clipboard $shotfile
+rm $shotfile

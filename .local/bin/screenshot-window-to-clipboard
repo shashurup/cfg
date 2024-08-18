@@ -1,0 +1,10 @@
+#!/bin/sh
+winid=$(xwininfo | grep 'Window id' | grep -oe '0x[0-9a-f]*')
+test $? -eq 0 || exit
+shotfile=$(mktemp --suffix=.png)
+sleep $1
+test -n "$1" && sleep $1
+shotgun -i $winid $shotfile
+lazpaint $shotfile -editor [Window]ColorWindowVisible=0,LayerWindowVisible=0,[Tool]ForeColor=FF0000FF,BackColor=00000000 $shotfile
+xclip -t 'image/png' -selection clipboard $shotfile
+rm $shotfile
