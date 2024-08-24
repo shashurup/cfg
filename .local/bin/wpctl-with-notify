@@ -1,0 +1,5 @@
+#!/bin/sh
+
+wpctl set-volume @DEFAULT_AUDIO_SINK@ "$@"
+vol=$(wpctl get-volume @DEFAULT_AUDIO_SINK@)
+dunstify -r 42 -t 2000 "$vol"
