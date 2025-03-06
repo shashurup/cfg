@@ -205,6 +205,9 @@
   :bind (("C-x b" . consult-buffer)
          ("C-x p b" . consult-project-extra-find)
          :map space-map
+         ("/" . (lambda () 
+                  (interactive)
+                  (consult-ripgrep nil (thing-at-point 'symbol))))
          ("j" . my-jump))
   :config (progn
             (defun my-jump ()
@@ -218,14 +221,6 @@
                                      (map-merge 'plist
                                                 consult-project-extra--source-project
                                                 '(:hidden t)))))))
-
-
-(use-package consult-ag
-  :after consult
-  :bind (:map space-map
-              ("/" . (lambda () 
-                       (interactive)
-                       (consult-ag nil (thing-at-point 'symbol))))))
 
 
 (use-package consult-eglot
