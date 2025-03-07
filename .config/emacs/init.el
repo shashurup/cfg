@@ -138,7 +138,7 @@
   :hook (org-mode . (lambda () (org-superstar-mode 1))))
 
 (defun my-letter-p (ch)
-  (and (>= ch 97) (<= ch 122)))
+  (and (numberp ch) (>= ch 97) (<= ch 122)))
 
 
 ;; Builds a new keymap from major mode map
