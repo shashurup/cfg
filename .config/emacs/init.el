@@ -316,7 +316,7 @@
 
 ;; Allow using other frames to jump to the already opened buffer
 ;; Used to jump to a cider REPL buffer
-(setopt display-buffer-alist '((t display-buffer-reuse-window (reusable-frames . 0))))
+(setopt display-buffer-base-action '(display-buffer-reuse-window (reusable-frames . 0)))
 
 (custom-set-faces
  ;; custom-set-faces was added by Custom.
