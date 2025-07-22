@@ -69,17 +69,11 @@ def search_node(tree, cond, parents=[]):
             return result
 
 def find_parent(parents):
-    floating = False
     for parent in parents:
         if len(parent['nodes']) > 1 and parent['layout'] != 'tabbed':
-            return parent, floating
-        if parent['type'] == 'floating_con':
-            floating = True
+            return parent
         if parent['type'] == 'workspace':
-            if floating:
-                return parent, floating
-            else:
-                break
+            return parent
         
 def find_next_floating_size(win_size, monitor_size):
     win_width, win_height = win_size
@@ -166,9 +160,10 @@ elif action == 'cycle-size':
     from pprint import pprint as pp
     tree = global_tree(sock)
     node, parents = search_node(tree, lambda x: x['focused'])
+    for p in parents: print(p['name'])
     if node and node['fullscreen_mode'] == 0:
-        parent, floating = find_parent(parents)
-        if floating:
+        parent = find_parent(parents)
+        if node['type'] == 'floating_con':
             width = node['rect']['width']
             height = node['rect']['height']
             ws_width = parent['rect']['width']
