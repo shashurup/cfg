@@ -1,5 +1,6 @@
 #!/bin/sh
-rect=$(hacksaw -g 2 -c ff8000)
+# rect=$(hacksaw -g 2 -c ff8000)
+rect=$(slop -c 255,128,0)
 test $? -eq 0 || exit
 shotfile=$(mktemp --suffix=.png)
 test -n "$1" && sleep $1
