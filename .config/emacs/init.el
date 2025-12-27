@@ -61,6 +61,8 @@
 (recentf-mode)
 
 (pixel-scroll-precision-mode)
+(setq scroll-conservatively 1000)
+(setq scroll-margin 2)
 
 ;; ediff
 (setq ediff-split-window-function 'split-window-horizontally)
