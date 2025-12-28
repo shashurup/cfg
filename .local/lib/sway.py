@@ -1,3 +1,4 @@
+from itertools import groupby
 import json
 import socket
 import subprocess
@@ -99,22 +100,21 @@ sock.connect(sock_path)
 action = sys.argv[1]
 if action == 'workspace':
     prefix = sys.argv[2] if len(sys.argv) > 2 else ''
-    found = False
-    focused = None
-    switched = False
     wss = list_workspaces(sock)
+    ws_exists = prefix and [ws for ws in wss
+                            if ws['name'].startswith(prefix)]
     if prefix:
-        for ws in wss:
-            if ws['name'].startswith(prefix):
-                found = True
-                if ws['focused']:
-                    focused = ws['name']
-                if not ws['visible']:
-                    switched = True
-                    run_command(sock, f'workspace {ws["name"]}')
-    if not switched:
-        run_command(sock, f'workspace {focused}')
-    if not found:
+        target = [ws for ws in wss
+                  if not ws['visible'] and ws['name'].startswith(prefix)]
+        if target:
+            for _, v in groupby(target, lambda x: x["output"]):
+                ws_name = next(v)["name"]
+                run_command(sock, f'workspace {ws_name}')
+        else:
+            focused = [ws for ws in wss if ws['focused']]
+            if focused:
+                run_command(sock, f'workspace {focused[0]["name"]}')
+    if not ws_exists:
         if not workspace_num(prefix):
             new_num = new_workspace_num(wss)
             if new_num and prefix:
