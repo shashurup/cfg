@@ -106,20 +106,20 @@ action = sys.argv[1]
 if action == 'workspace':
     prefix = sys.argv[2] if len(sys.argv) > 2 else ''
     wss = list_workspaces(sock)
-    ws_exists = prefix and [ws for ws in wss
-                            if ws['name'].startswith(prefix)]
+    target = []
     if prefix:
-        target = [ws for ws in wss
-                  if not ws['visible'] and ws['name'].startswith(prefix)]
-        if target:
-            for _, v in groupby(target, lambda x: x["output"]):
+        target = [ws for ws in wss if ws['name'].startswith(prefix)]
+    if target:
+        invisible = [ws for ws in target if not ws['visible']]
+        if invisible:
+            for _, v in groupby(invisible, lambda x: x["output"]):
                 ws_name = next(v)["name"]
                 run_command(sock, f'workspace {ws_name}')
         else:
             focused = [ws for ws in wss if ws['focused']]
             if focused:
                 run_command(sock, f'workspace {focused[0]["name"]}')
-    if not ws_exists:
+    else:
         if not workspace_num(prefix):
             new_num = new_workspace_num(wss)
             if new_num and prefix:
