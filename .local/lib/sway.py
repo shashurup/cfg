@@ -46,7 +46,7 @@ def workspace_num(workspace_name):
         return int(workspace_name[0])
 
 def new_workspace_num(workspaces):
-    num_set = set(workspace_num(w) for w in workspaces)
+    num_set = set(workspace_num(w['name']) for w in workspaces)
     for num in [1, 2, 3, 4, 5, 6, 7, 8, 9, 0]:
         if num not in num_set:
             return num
@@ -100,12 +100,20 @@ action = sys.argv[1]
 if action == 'workspace':
     prefix = sys.argv[2] if len(sys.argv) > 2 else ''
     found = False
-    wss = [w['name'] for w in list_workspaces(sock)]
+    focused = None
+    switched = False
+    wss = list_workspaces(sock)
     if prefix:
         for ws in wss:
-            if ws.startswith(prefix):
-                run_command(sock, f'workspace {ws}')
+            if ws['name'].startswith(prefix):
                 found = True
+                if ws['focused']:
+                    focused = ws['name']
+                if not ws['visible']:
+                    switched = True
+                    run_command(sock, f'workspace {ws["name"]}')
+    if not switched:
+        run_command(sock, f'workspace {focused}')
     if not found:
         if not workspace_num(prefix):
             new_num = new_workspace_num(wss)
@@ -115,7 +123,7 @@ if action == 'workspace':
                 prefix = str(new_num)
         run_command(sock, f'workspace {prefix}')
 elif action == 'menu':
-    wss = [w['name'] for w in list_workspaces(sock)]
+    wss = list_workspaces(sock)
     new_num = new_workspace_num(wss)
     options = [f'workspace {new_num}',
                'rename workspace to ',
@@ -125,8 +133,8 @@ elif action == 'menu':
     for o in outputs:
         options.append(f'move workspace to output {o}')
     for ws in wss:
-        options.append(f'move container to workspace {ws}')
-        options.append(f'move container to workspace {ws}; workspace {ws}')
+        options.append(f'move container to workspace {ws["name"]}')
+        options.append(f'move container to workspace {ws["name"]}; workspace {ws["name"]}')
     options.extend(['split horizontal',
                     'split vertical',
                     'layout stacking',
@@ -193,4 +201,4 @@ elif action == 'cycle-size':
                 run_command(sock, f'resize set {prop} {new_size}px')
 elif action == 'test':
     from pprint import pprint as pp
-    pp(new_workspace_num(w for w in list_workspaces(sock)))
+    pp(new_workspace_num(list_workspaces(sock)))
